@@ -1,4 +1,4 @@
-import errors from "../errors.json";
+import errors from "../errors.json" assert { type: "json" };
 
 export default function responseError(res, statusCode, message) {
   if (res === null)

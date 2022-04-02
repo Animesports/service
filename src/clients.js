@@ -1,7 +1,7 @@
 import express from "express";
 import { getAllClientDataWithId, updateClient } from "../database/functions.js";
 import responseError from "../utils/errors.js";
-import schemas from "../schemas.json";
+import schemas from "../schemas.json" assert { type: "json" };
 import { ArrToObj, ObjToArr } from "../utils/converter.js";
 
 const router = express();
