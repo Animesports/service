@@ -36,7 +36,7 @@ export function updateClient({ id, props }) {
 export function removeClient({ email, name }) {
   return new Promise((resolve, reject) => {
     Connection.clients
-      .deleteOne({ "data.email.address": email, "data.name": name })
+      .deleteOne({ "data.email.address": email })
       .then(resolve, reject);
   });
 }

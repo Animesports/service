@@ -1,11 +1,4 @@
-import { readFile } from "fs/promises";
-
-let errors = {};
-
-const loadErrors = async () => {
-  errors = JSON.parse(await readFile("./errors.json"));
-};
-loadErrors();
+import errors from "../errors.json";
 
 export default function responseError(res, statusCode, message) {
   if (res === null)

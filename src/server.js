@@ -3,7 +3,7 @@ import express from "express";
 import dotenv from "dotenv";
 import responseError from "../utils/errors.js";
 import { validateClient } from "../database/functions.js";
-import routes, { appRoutes, adminRoutes } from "./routes.js";
+import routes, { adminRoutes, appRoutes } from "./routes.js";
 import { Connection } from "../database/connection.js";
 import override from "./override.js";
 
@@ -46,20 +46,28 @@ router.use((req, res, next) => {
   );
 });
 
-// Filter Only App Routes
-appRoutes.forEach(([method, address]) => {
-  router[method](address, (req, res, next) => {
-    if (res.locals.onlyapp !== true) return responseError(res, 401);
-    next();
-  });
+// Validate App Route
+router.use("/app*", (req, res, next) => {
+  if (res.locals.onlyapp !== true) return responseError(res, 401);
+  next();
 });
 
-// Filter Only Admin Routes
-adminRoutes.forEach(([method, address]) => {
-  router[method](address, (req, res, next) => {
-    if (res.locals.admin !== true) return responseError(res, 401);
-    next();
-  });
+// Validate Admin Route
+router.use("/admin*", (req, res, next) => {
+  if (res.locals.admin !== true) return responseError(res, 401);
+  next();
+});
+
+// Use App Routes
+Object.keys(appRoutes).forEach((scope) => {
+  const address = scope.toLowerCase().replace("app", "");
+  router.use(`/app/${address}`, appRoutes[scope].router);
+});
+
+// Use Admin Routes
+Object.keys(adminRoutes).forEach((scope) => {
+  const address = scope.toLowerCase().replace("admin", "");
+  router.use(`/admin/${address}`, adminRoutes[scope].router);
 });
 
 // User All Avaliable Routes
