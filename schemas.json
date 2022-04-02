@@ -1,0 +1,14 @@
+{
+  "user": {
+    "data.name": "string",
+    "data.email.address": "string",
+    "data.email.verified": "boolean",
+    "data.pix": "string",
+    "data.password": "string",
+    "data.admin": "boolean",
+
+    "config.twosteps": "boolean",
+    "config.video": "boolean",
+    "config.darkmode": "boolean"
+  }
+}

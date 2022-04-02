@@ -1,0 +1,6 @@
+{
+  "400": "Bad Request: Incorrect parameters",
+  "401": "Unauthorized: Invalid/non-existent authentication",
+  "404": "Not Found: Unknown address",
+  "501": "Server Error: Internal error during processing"
+}
