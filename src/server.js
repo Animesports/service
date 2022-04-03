@@ -6,9 +6,19 @@ import { validateClient } from "../database/functions.js";
 import routes, { adminRoutes, appRoutes } from "./routes.js";
 import { Connection } from "../database/connection.js";
 import override from "./override.js";
+import cors from "cors";
 
 dotenv.config();
 const router = express();
+
+// Cors
+
+router.use(
+  cors({
+    origin: ["https://animesports.cf"],
+  })
+);
+router.use(express.json());
 
 // Default Routes
 router.use(override.router);
