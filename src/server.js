@@ -15,7 +15,11 @@ const router = express();
 
 router.use(
   cors({
-    origin: ["https://animesports.cf"],
+    origin: [
+      process.env.NODE_ENV === "development"
+        ? "http://localhost:3000"
+        : "https://animesports.cf",
+    ],
   })
 );
 router.use(express.json());
