@@ -1,6 +1,40 @@
 import { Connection } from "./connection.js";
 Connection.check();
 
+export function validationSearcher(parameter) {
+  return new Promise((accept, reject) => {
+    Connection.validation.findOne(parameter).then(accept, reject);
+  });
+}
+
+export function validationRemove(parameter) {
+  return new Promise((accept, reject) => {
+    Connection.validation.deleteOne(parameter).then(accept, reject);
+  });
+}
+
+export function validationCreate({ type, value, reference }) {
+  return new Promise(async (accept, reject) => {
+    const expire = new Date();
+    expire.setMinutes(expire.getMinutes() + 10);
+
+    await Connection.validation.createIndex(
+      { expireAt: 1 },
+      { expireAfterSeconds: 0 }
+    );
+
+    await Connection.validation
+      .insertOne({
+        expireAt: expire,
+        logEvent: 1,
+        logMessage: "Success!",
+        reference,
+        [type]: value,
+      })
+      .then(accept, reject);
+  });
+}
+
 export function insertNewClient({ name, email, password, id }) {
   // Inserir um novo client no Banco de dados
   return new Promise((accept, reject) => {
@@ -24,6 +58,14 @@ export function insertNewClient({ name, email, password, id }) {
         },
       })
       .then(accept, reject);
+  });
+}
+
+export function updateClientByEmail({ email, props }) {
+  return new Promise((resolve, reject) => {
+    Connection.clients
+      .updateOne({ "data.email.address": email }, { $set: props })
+      .then(resolve, reject);
   });
 }
 

@@ -75,6 +75,7 @@ router.use("/admin*", (req, res, next) => {
 // Use App Routes
 Object.keys(appRoutes).forEach((scope) => {
   const address = scope.toLowerCase().replace("app", "");
+
   router.use(`/app/${address}`, appRoutes[scope].router);
 });
 
