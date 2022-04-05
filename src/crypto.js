@@ -4,10 +4,9 @@ import { serverEncoder, tools } from "../utils/crypto.js";
 const router = express.Router();
 
 router.use("*", (req, res, next) => {
-  if (!req.body.encrypted) return next();
+  if (!req.body?.encrypted) return next();
   serverEncoder((server) => {
-    req.body =
-      req.body.encrypted && JSON.parse(server.decrypt(req.body.encrypted));
+    req.body = JSON.parse(server.decrypt(req.body.encrypted));
     next();
   });
 });
