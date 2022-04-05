@@ -3,10 +3,11 @@ import express from "express";
 import dotenv from "dotenv";
 import responseError from "../utils/errors.js";
 import { validateClient } from "../database/functions.js";
-import routes, { adminRoutes, appRoutes } from "./routes.js";
+import routes, { adminRoutes, appRoutes } from "../src/routes.js";
 import { Connection } from "../database/connection.js";
-import override from "./override.js";
+import override from "../src/override.js";
 import cors from "cors";
+import crypto from "./crypto.js";
 
 dotenv.config();
 const router = express();
@@ -26,6 +27,7 @@ router.use(express.json());
 
 // Default Routes
 router.use(override.router);
+router.use(crypto.router);
 
 // Connect Database (check && connect)
 router.use(async (req, res, next) => {
@@ -75,7 +77,6 @@ router.use("/admin*", (req, res, next) => {
 // Use App Routes
 Object.keys(appRoutes).forEach((scope) => {
   const address = scope.toLowerCase().replace("app", "");
-
   router.use(`/app/${address}`, appRoutes[scope].router);
 });
 
