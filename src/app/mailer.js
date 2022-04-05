@@ -6,6 +6,8 @@ import {
   validationSearcher,
 } from "../../database/functions.js";
 import responseError from "../../utils/errors.js";
+import { sendEmail } from "../../utils/mailer.js";
+import { CodeValidation, TokenValidation } from "../../utils/mailShape.js";
 import { generateCode, generateToken } from "../../utils/token.js";
 
 const router = express();
@@ -22,7 +24,21 @@ router.post("/code", async (req, res) => {
         reference: email,
       }).then(
         ({ acknowledged }) => {
-          res.json({ success: acknowledged, code });
+          if (!acknowledged) return responseError(res, 500);
+
+          sendEmail(
+            {
+              subject: "[Animesports] Confirmação de Email",
+              text: CodeValidation(code).text,
+              html: CodeValidation(code).html,
+              email,
+            },
+            (err, info) => {
+              if (err) return responseError(res, 500);
+              if (info?.accepted) return res.json({ success: true });
+              res.json({ success: false });
+            }
+          );
         },
         () => {
           responseError(res, 500);
@@ -41,7 +57,7 @@ router.get("/code/:code", async (req, res) => {
 
   await validationSearcher({ code }).then(
     async (document) => {
-      if (!document.reference) return responseError(res, 510);
+      if (!document?.reference) return responseError(res, 510);
       await updateClientByEmail({
         email: document.reference,
         props: {
@@ -70,7 +86,20 @@ router.post("/token", async (req, res) => {
         reference: email,
       }).then(
         ({ acknowledged }) => {
-          res.json({ success: acknowledged, token });
+          if (!acknowledged) return responseError(res, 500);
+          sendEmail(
+            {
+              subject: "[Animesports] Confirmação de Email",
+              text: TokenValidation(token).text,
+              html: TokenValidation(token).html,
+              email,
+            },
+            (err, info) => {
+              if (err) return responseError(res, 500);
+              if (info?.accepted) return res.json({ success: true });
+              res.json({ success: false });
+            }
+          );
         },
         () => {
           responseError(res, 500);
@@ -89,7 +118,7 @@ router.get("/token/:token", async (req, res) => {
 
   await validationSearcher({ token }).then(
     async (document) => {
-      if (!document.reference) return responseError(res, 510);
+      if (!document?.reference) return responseError(res, 510);
       await updateClientByEmail({
         email: document.reference,
         props: {
