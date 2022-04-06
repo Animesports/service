@@ -25,12 +25,41 @@ router.post("/", async (req, res) => {
     async (id) => {
       await insertNewClient({ name, email, password, id }).then(
         async ({ acknowledged }) => {
+          const clientInserted = acknowledged;
+
           if (acknowledged) {
-            const client = await getAllClientDataWithId({ id });
-            return res.json({
-              success: acknowledged,
-              client: client ?? responseError(null, 510),
-            });
+            return await getAllClientDataWithId({ id }).then(
+              async (client) => {
+                await generateSessionId({ id: client.id }).then(
+                  async (sessionId) => {
+                    await insertNewSession({
+                      sessionId,
+                      id: client.id,
+                      password: client.data.password,
+                      email: client.data.email.address,
+                    }).then(
+                      ({ acknowledged }) => {
+                        if (!acknowledged) return error(clientInserted);
+                        res.json({
+                          success: true,
+                          sessionId,
+                          client: client,
+                        });
+                      },
+                      () => {
+                        error(clientInserted);
+                      }
+                    );
+                  },
+                  () => {
+                    error(clientInserted);
+                  }
+                );
+              },
+              () => {
+                error(clientInserted);
+              }
+            );
           }
           responseError(res, 501);
         }
@@ -40,6 +69,15 @@ router.post("/", async (req, res) => {
       responseError(res, 501);
     }
   );
+
+  function error(inserted) {
+    if (inserted)
+      return res.json({
+        success: true,
+        client: responseError(null, 510),
+      });
+    responseError(res, 501);
+  }
 });
 
 router.post("/validate", async (req, res) => {
@@ -55,7 +93,8 @@ router.post("/validate", async (req, res) => {
           password: client.data.password,
           email: client.data.email.address,
         }).then(
-          () => {
+          ({ acknowledged }) => {
+            if (!acknowledged) return responseError(res, 501);
             res.json({ valid: true, sessionId, client });
           },
           () => {
