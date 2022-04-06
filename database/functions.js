@@ -1,6 +1,36 @@
 import { Connection } from "./connection.js";
 Connection.check();
 
+export function insertNewSession({ sessionId, id, password, email }) {
+  return new Promise(async (accept, reject) => {
+    const expire = new Date();
+    expire.setDate(expire.getDay() + 7);
+
+    await Connection.validation.createIndex(
+      { expireAt: 1 },
+      { expireAfterSeconds: 0 }
+    );
+
+    Connection.session
+      .insertOne({
+        expireAt: expire,
+        logEvent: 1,
+        logMessage: "Success!",
+        sessionId,
+        id,
+        password,
+        email,
+      })
+      .then(accept, reject);
+  });
+}
+
+export function searchSessionById({ sessionId }) {
+  return new Promise((accept, reject) => {
+    Connection.session.findOne({ sessionId }).then(accept, reject);
+  });
+}
+
 export function validationSearcher(parameter) {
   return new Promise((accept, reject) => {
     Connection.validation.findOne(parameter).then(accept, reject);
@@ -75,7 +105,7 @@ export function updateClient({ id, props }) {
   });
 }
 
-export function removeClient({ email, name }) {
+export function removeClient({ email }) {
   return new Promise((resolve, reject) => {
     Connection.clients
       .deleteOne({ "data.email.address": email })
@@ -83,12 +113,14 @@ export function removeClient({ email, name }) {
   });
 }
 
-export function validateClient({ id }) {
+export function validateClient({ id, email, password }) {
   // Validar um id ou verificar sua existência no Banco
   return new Promise((resolve, reject) => {
-    Connection.clients.findOne({ id }).then((client) => {
-      resolve({ id: client?.id, admin: client?.data?.admin });
-    }, reject);
+    Connection.clients
+      .findOne({ id, "data.email.address": email, "data.password": password })
+      .then((client) => {
+        resolve({ id: client?.id, admin: client?.data?.admin });
+      }, reject);
   });
 }
 

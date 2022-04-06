@@ -1,6 +1,32 @@
-import { findClientId, validationSearcher } from "../database/functions.js";
+import {
+  findClientId,
+  searchSessionById,
+  validationSearcher,
+} from "../database/functions.js";
 import { v5 as uuidv5, v4 as uuidv4 } from "uuid";
 import TokenGenerator from "uuid-token-generator";
+
+export function generateSessionId({ id }) {
+  return new Promise((accept, reject) => {
+    let times = 10;
+
+    (async function generate() {
+      times--;
+
+      const sessionId = `
+      ${uuidv5(id, uuidv4())}
+      @
+      ${new TokenGenerator(256, TokenGenerator.BASE62).generate()}
+      `;
+
+      await searchSessionById({ sessionId }).then((session) => {
+        if (!session?.sessionId) return accept(sessionId);
+        if (times <= 0) return reject(new Error("max-generate-times"));
+        setTimeout(generate, 10);
+      });
+    })();
+  });
+}
 
 export function generateCode() {
   return new Promise((accept, reject) => {

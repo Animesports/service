@@ -42,8 +42,9 @@ export class Connection {
   }
 
   static collections() {
-    this.clients = this.db.collection(`clients`);
-    this.validation = this.db.collection(`validation`);
+    this.clients = this.db.collection("clients");
+    this.validation = this.db.collection("validation");
+    this.session = this.db.collection("session");
   }
 }
 

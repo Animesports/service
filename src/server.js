@@ -8,11 +8,10 @@ import { Connection } from "../database/connection.js";
 import override from "../src/override.js";
 import cors from "cors";
 import crypto from "./crypto.js";
+import session from "./session.js";
 
 dotenv.config();
 const router = express();
-
-// Cors
 
 router.use(
   cors({
@@ -39,19 +38,16 @@ router.use(async (req, res, next) => {
   responseError(res, 500);
 });
 
+// Session Control
+router.use(session.router);
+
 // Authentication (app && user)
 router.use((req, res, next) => {
-  const [authorization, id] = req.headers.authorization?.split("@") ?? [];
+  if (res.locals.onlyapp) return next();
 
-  if (authorization !== process.env.APP_TOKEN || !id)
-    return responseError(res, 401);
+  const { id, email, password } = res.locals.session;
 
-  if (id === process.env.APP_ID) {
-    res.locals.onlyapp = true;
-    return next();
-  }
-
-  validateClient({ id }).then(
+  validateClient({ id, email, password }).then(
     ({ id, admin }) => {
       if (!id) return responseError(res, 401);
       res.locals.id = id;

@@ -2,10 +2,11 @@ import express from "express";
 import {
   findClientEmail,
   insertNewClient,
+  insertNewSession,
   validateClientCredentials,
 } from "../../database/functions.js";
 import responseError from "../../utils/errors.js";
-import { generateId } from "../../utils/token.js";
+import { generateId, generateSessionId } from "../../utils/token.js";
 
 const router = express();
 
@@ -39,8 +40,22 @@ router.post("/validate", async (req, res) => {
   if (!email || !password) return responseError(res, 400);
 
   await validateClientCredentials({ email, password }).then(
-    (client) => {
-      res.json({ valid: true, client });
+    async (client) => {
+      await generateSessionId({ id: client.id }).then(async (sessionId) => {
+        await insertNewSession({
+          sessionId,
+          id: client.id,
+          password: client.data.password,
+          email: client.data.email.address,
+        }).then(
+          () => {
+            res.json({ valid: true, sessionId, client });
+          },
+          () => {
+            responseError(res, 501);
+          }
+        );
+      });
     },
     (error) => {
       if (error !== "not-found") return responseError(res, 501);
