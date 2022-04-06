@@ -1,6 +1,7 @@
 import express from "express";
 import {
   findClientEmail,
+  getAllClientDataWithId,
   insertNewClient,
   insertNewSession,
   validateClientCredentials,
@@ -23,8 +24,14 @@ router.post("/", async (req, res) => {
   await generateId({ email }).then(
     async (id) => {
       await insertNewClient({ name, email, password, id }).then(
-        ({ acknowledged }) => {
-          if (acknowledged) return res.json({ success: acknowledged });
+        async ({ acknowledged }) => {
+          if (acknowledged) {
+            const client = await getAllClientDataWithId({ id });
+            return res.json({
+              success: acknowledged,
+              client: client ?? responseError(null, 510),
+            });
+          }
           responseError(res, 501);
         }
       );
