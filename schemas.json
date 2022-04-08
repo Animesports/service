@@ -10,5 +10,12 @@
     "config.twosteps": "boolean",
     "config.video": "boolean",
     "config.darkmode": "boolean"
+  },
+  "session": {
+    "expireAt": ["object", null],
+    "sessionId": ["string", null],
+    "id": ["string", null],
+    "email": ["string", "data.email.address"],
+    "password": ["string", "data.password"]
   }
 }

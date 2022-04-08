@@ -1,5 +1,9 @@
 import express from "express";
-import { getAllClientDataWithId, updateClient } from "../database/functions.js";
+import {
+  getAllClientDataWithId,
+  updateClient,
+  updateSession,
+} from "../database/functions.js";
 import responseError from "../utils/errors.js";
 import schemas from "../schemas.json" assert { type: "json" };
 import { ArrToObj, ObjToArr } from "../utils/converter.js";
@@ -17,7 +21,9 @@ router.get("/", async (req, res) => {
 
 router.patch("/", async (req, res) => {
   const id = res.locals.id;
+  const sessionId = res.locals.session.sessionId;
   const props = req.body;
+
   if (!props || typeof props !== "object") return responseError(res, 400);
 
   const acceptProps = ObjToArr(props).filter(([key, value]) => {
@@ -25,6 +31,18 @@ router.patch("/", async (req, res) => {
   });
 
   if (acceptProps.length <= 0) return responseError(res, 400);
+
+  const sessionProps = ObjToArr(schemas.session)
+    .filter(([_s, [_t, uKey]]) => {
+      return acceptProps.map(([key]) => key).includes(uKey);
+    })
+    .map(([key, [_t, uKey]]) => {
+      return [key, ArrToObj(acceptProps)[uKey]];
+    });
+
+  if (sessionProps.length >= 1) {
+    await updateSession({ sessionId, props: ArrToObj(sessionProps) });
+  }
 
   await updateClient({ id, props: ArrToObj(acceptProps) }).then(
     ({ acknowledged, modifiedCount }) => {

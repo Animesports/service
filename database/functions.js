@@ -1,6 +1,13 @@
 import { Connection } from "./connection.js";
 Connection.check();
 
+export function updateSession({ sessionId, props }) {
+  return new Promise((resolve, reject) => {
+    Connection.session
+      .updateOne({ sessionId }, { $set: props })
+      .then(resolve, reject);
+  });
+}
 export function insertNewSession({ sessionId, id, password, email }) {
   return new Promise(async (accept, reject) => {
     const expire = new Date();
