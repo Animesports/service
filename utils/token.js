@@ -13,7 +13,7 @@ export function generateSessionId({ id }) {
     (async function generate() {
       times--;
 
-      const sessionId = `${uuidv5(id, uuidv4())}@${new TokenGenerator(
+      const sessionId = `${uuidv5(id, uuidv4())}to=${new TokenGenerator(
         256,
         TokenGenerator.BASE62
       ).generate()}`;
