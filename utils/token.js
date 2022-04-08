@@ -13,11 +13,10 @@ export function generateSessionId({ id }) {
     (async function generate() {
       times--;
 
-      const sessionId = `
-      ${uuidv5(id, uuidv4())}
-      @
-      ${new TokenGenerator(256, TokenGenerator.BASE62).generate()}
-      `;
+      const sessionId = `${uuidv5(id, uuidv4())}@${new TokenGenerator(
+        256,
+        TokenGenerator.BASE62
+      ).generate()}`;
 
       await searchSessionById({ sessionId }).then((session) => {
         if (!session?.sessionId) return accept(sessionId);
