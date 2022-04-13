@@ -1,6 +1,12 @@
 import { Connection } from "./connection.js";
 Connection.check();
 
+export function getAllPayments() {
+  return new Promise(async (resolve, reject) => {
+    Connection.payments.find().toArray().then(resolve, reject);
+  });
+}
+
 export function searchPayment({ paymentId }) {
   return new Promise(async (resolve, reject) => {
     Connection.payments
@@ -127,6 +133,12 @@ export function validationCreate({ type, value, reference }) {
         [type]: value,
       })
       .then(accept, reject);
+  });
+}
+
+export function getAllClients() {
+  return new Promise((accept, reject) => {
+    Connection.clients.find().toArray().then(accept, reject);
   });
 }
 
