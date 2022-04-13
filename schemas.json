@@ -12,10 +12,12 @@
     "config.darkmode": "boolean"
   },
   "session": {
-    "expireAt": ["object", null],
-    "sessionId": ["string", null],
-    "id": ["string", null],
     "email": ["string", "data.email.address"],
     "password": ["string", "data.password"]
+  },
+  "payment": {
+    "expireAt": "object",
+    "value": "number",
+    "verified": "boolean"
   }
 }

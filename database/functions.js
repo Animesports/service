@@ -1,6 +1,64 @@
 import { Connection } from "./connection.js";
 Connection.check();
 
+export function searchPayment({ paymentId }) {
+  return new Promise(async (resolve, reject) => {
+    Connection.payments
+      .findOne({
+        paymentId,
+      })
+      .then(resolve, reject);
+  });
+}
+
+export function deletePayment({ paymentId }) {
+  return new Promise(async (resolve, reject) => {
+    Connection.payments
+      .deleteOne({
+        paymentId,
+      })
+      .then(resolve, reject);
+  });
+}
+
+export function insertNewPayment({ value, paymentId, id }) {
+  return new Promise(async (resolve, reject) => {
+    const expire = new Date();
+    expire.setMonth(expire.getMonth() + 1);
+
+    await Connection.payments.createIndex(
+      { expireAt: 1 },
+      { expireAfterSeconds: 0 }
+    );
+
+    Connection.payments
+      .insertOne({
+        expireAt: expire,
+        logEvent: 1,
+        logMessage: "Success!",
+        value,
+        verified: false,
+        id: paymentId,
+        reference: id,
+      })
+      .then(resolve, reject);
+  });
+}
+
+export function updatePayment({ id, props }) {
+  return new Promise((resolve, reject) => {
+    Connection.payments
+      .updateOne({ id }, { $set: props })
+      .then(resolve, reject);
+  });
+}
+
+export function getAllPaymentWithId({ id }) {
+  return new Promise((resolve, reject) => {
+    Connection.payments.find({ reference: id }).toArray().then(resolve, reject);
+  });
+}
+
 export function updateSession({ sessionId, props }) {
   return new Promise((resolve, reject) => {
     Connection.session

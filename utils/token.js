@@ -1,10 +1,31 @@
 import {
   findClientId,
+  searchPayment,
   searchSessionById,
   validationSearcher,
 } from "../database/functions.js";
 import { v5 as uuidv5, v4 as uuidv4 } from "uuid";
 import TokenGenerator from "uuid-token-generator";
+
+export function generatePaymentId({ identifier }) {
+  return new Promise((accept, reject) => {
+    let times = 10;
+
+    (async function generate() {
+      times--;
+
+      const paymentId = `${identifier ?? "ans"}${Math.round(
+        1000 + Math.random() * 9999
+      )}`;
+
+      await searchPayment({ paymentId }).then((payment) => {
+        if (!payment?.paymentId) return accept(paymentId);
+        if (times <= 0) return reject(new Error("max-generate-times"));
+        setTimeout(generate, 10);
+      });
+    })();
+  });
+}
 
 export function generateSessionId({ id }) {
   return new Promise((accept, reject) => {
