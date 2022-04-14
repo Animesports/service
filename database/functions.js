@@ -11,7 +11,7 @@ export function searchPayment({ paymentId }) {
   return new Promise(async (resolve, reject) => {
     Connection.payments
       .findOne({
-        paymentId,
+        id: paymentId,
       })
       .then(resolve, reject);
   });
@@ -21,7 +21,7 @@ export function deletePayment({ paymentId }) {
   return new Promise(async (resolve, reject) => {
     Connection.payments
       .deleteOne({
-        paymentId,
+        id: paymentId,
       })
       .then(resolve, reject);
   });
@@ -43,6 +43,7 @@ export function insertNewPayment({ value, paymentId, id }) {
         logEvent: 1,
         logMessage: "Success!",
         value,
+        type: value > 0 ? "receive" : "send",
         verified: false,
         id: paymentId,
         reference: id,
@@ -51,10 +52,11 @@ export function insertNewPayment({ value, paymentId, id }) {
   });
 }
 
-export function updatePayment({ id, props }) {
+export function updatePayment({ paymentId, props }) {
+  console.info("updating:", { paymentId, props });
   return new Promise((resolve, reject) => {
     Connection.payments
-      .updateOne({ id }, { $set: props })
+      .updateOne({ id: paymentId }, { $set: props })
       .then(resolve, reject);
   });
 }

@@ -6,6 +6,7 @@ import {
 } from "../../database/functions.js";
 import { ObjToArr, ArrToObj } from "../../utils/converter.js";
 import responseError from "../../utils/errors.js";
+import schemas from "../../schemas.json" assert { type: "json" };
 
 const router = express();
 
@@ -25,6 +26,8 @@ router.patch("/:paymentId", async (req, res) => {
   const paymentId = req.params.paymentId;
   const props = req.body;
 
+  console.info(props);
+
   if (!paymentId) return responseError(res, 400);
 
   const acceptProps = ObjToArr(props).filter(([key, value]) => {
@@ -34,9 +37,9 @@ router.patch("/:paymentId", async (req, res) => {
   if (acceptProps.length <= 0) return responseError(res, 400);
 
   await updatePayment({ paymentId, props: ArrToObj(acceptProps) }).then(
-    (payments) => {
-      if (!Array.isArray(payments)) return responseError(res, 510);
-      res.json(payments);
+    ({ acknowledged, modifiedCount }) => {
+      res.json({ acknowledged, modifiedCount });
+      console.info(acknowledged, modifiedCount);
     },
     () => {
       responseError(res, 501);
@@ -45,7 +48,8 @@ router.patch("/:paymentId", async (req, res) => {
 });
 
 router.delete("/:paymentId", async (req, res) => {
-  const { paymentId } = req.params.paymentId;
+  const paymentId = req.params.paymentId;
+
   if (!paymentId) return responseError(res, 400);
 
   await deletePayment({ paymentId }).then(
