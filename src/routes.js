@@ -7,7 +7,7 @@ import payments from "./payments.js";
 
 export const adminRoutes = { adminClients, adminPayments };
 
-export const appRoutes = { appClients, appMailer };
+export const appRoutes = { appClients, appMailer, appSeasons };
 
 export default {
   clients,
