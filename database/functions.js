@@ -4,7 +4,7 @@ Connection.check();
 export function insertNewSeason({ id }) {
   return new Promise(async (resolve, reject) => {
     const expire = new Date();
-    expire.setMonth(expire.getMonth() + 3);
+    expire.setMonth(expire.getMonth() + 1);
 
     await Connection.seasons.createIndex(
       { expireAt: 1 },
@@ -14,6 +14,7 @@ export function insertNewSeason({ id }) {
     Connection.seasons
       .insertOne({
         expireAt: expire,
+        running: true,
         logEvent: 1,
         logMessage: "Success!",
         id,
