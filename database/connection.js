@@ -45,6 +45,7 @@ export class Connection {
     this.clients = this.db.collection("clients");
     this.validation = this.db.collection("validation");
     this.session = this.db.collection("session");
+    this.seasons = this.db.collection("seasons");
     this.payments = this.db.collection("payments");
   }
 }

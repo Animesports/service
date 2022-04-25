@@ -1,13 +1,14 @@
 import express from "express";
-import res from "express/lib/response";
 
 const router = express();
 
-router.post("/close", () => {
+router.post("/close", (req, res) => {
   res.send("Close season");
 });
 
-router.post("/open", () => {
+router.post("/open", (req, res) => {
+  const date = { day: 19, month: 4, year: 2022 } ?? req.body.date;
+
   res.send("Open season");
 });
 

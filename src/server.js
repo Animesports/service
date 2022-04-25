@@ -43,6 +43,11 @@ router.use(session.router);
 
 // Authentication (app && user)
 router.use((req, res, next) => {
+  res.locals.season = {
+    month: new Date().getMonth(),
+    year: new Date().getFullYear(),
+  };
+
   if (res.locals.onlyapp) return next();
 
   const { id, email, password } = res.locals.session;

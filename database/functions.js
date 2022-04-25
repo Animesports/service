@@ -1,6 +1,38 @@
 import { Connection } from "./connection.js";
 Connection.check();
 
+export function insertNewSeason({ id }) {
+  return new Promise(async (resolve, reject) => {
+    const expire = new Date();
+    expire.setMonth(expire.getMonth() + 3);
+
+    await Connection.seasons.createIndex(
+      { expireAt: 1 },
+      { expireAfterSeconds: 0 }
+    );
+
+    Connection.seasons
+      .insertOne({
+        expireAt: expire,
+        logEvent: 1,
+        logMessage: "Success!",
+        id,
+        references: [],
+        ticket: 3.5,
+        amount: 0,
+      })
+      .then(resolve, reject);
+  });
+}
+
+export function updateSeason({ id, func, props }) {
+  return new Promise((resolve, reject) => {
+    Connection.seasons
+      .updateOne({ id }, { [`$${func ?? "set"}`]: props })
+      .then(resolve, reject);
+  });
+}
+
 export function getAllPayments() {
   return new Promise(async (resolve, reject) => {
     Connection.payments.find().toArray().then(resolve, reject);
@@ -53,7 +85,6 @@ export function insertNewPayment({ value, paymentId, id }) {
 }
 
 export function updatePayment({ paymentId, props }) {
-  console.info("updating:", { paymentId, props });
   return new Promise((resolve, reject) => {
     Connection.payments
       .updateOne({ id: paymentId }, { $set: props })
