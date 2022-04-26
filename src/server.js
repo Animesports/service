@@ -41,13 +41,18 @@ router.use(async (req, res, next) => {
 // Session Control
 router.use(session.router);
 
-// Authentication (app && user)
+// Season Control
 router.use((req, res, next) => {
   res.locals.season = {
-    month: new Date().getMonth(),
+    day: new Date().getUTCDate(),
+    month: new Date().getMonth() + 1,
     year: new Date().getFullYear(),
   };
+  next();
+});
 
+// Authentication (app && user)
+router.use((req, res, next) => {
   if (res.locals.onlyapp) return next();
 
   const { id, email, password } = res.locals.session;

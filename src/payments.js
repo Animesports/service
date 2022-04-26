@@ -1,6 +1,7 @@
 import express from "express";
 import {
   getAllPaymentWithId,
+  getSeasonById,
   insertNewPayment,
 } from "../database/functions.js";
 import responseError from "../utils/errors.js";
@@ -18,10 +19,14 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
+  const season = res.locals.season;
   const id = res.locals.id;
-  const { value, identifier } = req.body;
+  const { identifier } = req.body;
 
-  if (!value) return responseError(res, 400);
+  const value = (await getSeasonById({ id: `${season.month}/${season.year}` }))
+    ?.ticket;
+
+  if (!identifier || !value) return responseError(res, 400);
 
   await generatePaymentId({ identifier }).then(
     async (paymentId) => {

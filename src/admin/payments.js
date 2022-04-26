@@ -25,6 +25,7 @@ router.get("/all", async (req, res) => {
 });
 
 router.patch("/:paymentId", async (req, res) => {
+  const season = res.locals.season;
   const paymentId = req.params.paymentId;
   const props = req.body.props;
   const reference = req.body.reference;
@@ -68,7 +69,7 @@ router.patch("/:paymentId", async (req, res) => {
 
         payment &&
           (await updateSeason({
-            id: Object.values(res.locals.season).join("/"),
+            id: `${season.month}/${season.year}`,
             func: "inc",
             props: {
               amount: payment.value,

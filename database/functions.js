@@ -1,6 +1,12 @@
 import { Connection } from "./connection.js";
 Connection.check();
 
+export function getSeasonById({ id }) {
+  return new Promise((resolve, reject) => {
+    Connection.seasons.findOne({ id }).then(resolve, reject);
+  });
+}
+
 export function insertNewSeason({ id }) {
   return new Promise(async (resolve, reject) => {
     const expire = new Date();

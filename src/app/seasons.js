@@ -1,13 +1,30 @@
 import express from "express";
-import { insertNewSeason, updateSeason } from "../../database/functions";
+import {
+  getSeasonById,
+  insertNewSeason,
+  updateSeason,
+} from "../../database/functions.js";
+import responseError from "../../utils/errors.js";
 
 const router = express();
 
+router.get("/", (req, res) => {
+  const { month, year } = res.locals.season;
+
+  getSeasonById({ id: `${month}/${year}` }).then(
+    (season) => {
+      res.json(season);
+    },
+    () => {
+      responseError(res, 501);
+    }
+  );
+});
+
 router.post("/close", (req, res) => {
-  const { month, year } =
-    { day: 19, month: 4, year: 2022 } ?? req.body.date_utc;
+  const { month, year } = req.body.utc_date ?? res.locals.season;
   updateSeason({
-    id: Object.values({ month, year }),
+    id: `${month}/${year}`,
     props: {
       running: false,
     },
@@ -25,10 +42,9 @@ router.post("/close", (req, res) => {
 });
 
 router.post("/open", (req, res) => {
-  const { month, year } =
-    { day: 19, month: 4, year: 2022 } ?? req.body.date_utc;
+  const { month, year } = req.body.utc_date ?? res.locals.season;
 
-  insertNewSeason({ id: Object.values({ month, year }).join("/") }).then(
+  insertNewSeason({ id: `${month}/${year}` }).then(
     () => {
       res.end();
     },
