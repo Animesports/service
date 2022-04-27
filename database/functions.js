@@ -10,6 +10,7 @@ export function getSeasonById({ id }) {
 export function insertNewSeason({ id }) {
   return new Promise(async (resolve, reject) => {
     const expire = new Date();
+
     expire.setMonth(expire.getMonth() + 1);
 
     await Connection.seasons.createIndex(
@@ -22,11 +23,10 @@ export function insertNewSeason({ id }) {
         expireAt: expire,
         running: true,
         logEvent: 1,
-        logMessage: "Success!",
+        logMessage: "Season Removed!",
         id,
         references: [],
         ticket: 3.5,
-        amount: 0,
       })
       .then(resolve, reject);
   });
@@ -37,6 +37,12 @@ export function updateSeason({ id, func, props }) {
     Connection.seasons
       .updateOne({ id }, { [`$${func ?? "set"}`]: props })
       .then(resolve, reject);
+  });
+}
+
+export function getAllPaymentBySeason({ season }) {
+  return new Promise(async (resolve, reject) => {
+    Connection.payments.find({ season }).toArray().then(resolve, reject);
   });
 }
 
@@ -69,6 +75,9 @@ export function deletePayment({ paymentId }) {
 export function insertNewPayment({ value, paymentId, id }) {
   return new Promise(async (resolve, reject) => {
     const expire = new Date();
+
+    if (expire.getDate() >= 25 && expire.getDate() < 28) expire.setDate(28);
+
     expire.setMonth(expire.getMonth() + 1);
 
     await Connection.payments.createIndex(
@@ -80,7 +89,7 @@ export function insertNewPayment({ value, paymentId, id }) {
       .insertOne({
         expireAt: expire,
         logEvent: 1,
-        logMessage: "Success!",
+        logMessage: "Payment Removed!",
         value,
         type: value > 0 ? "receive" : "send",
         verified: false,
@@ -115,7 +124,7 @@ export function updateSession({ sessionId, props }) {
 export function insertNewSession({ sessionId, id, password, email }) {
   return new Promise(async (accept, reject) => {
     const expire = new Date();
-    expire.setDate(expire.getDay() + 7);
+    expire.setDate(expire.getDay() + 2);
 
     await Connection.validation.createIndex(
       { expireAt: 1 },
@@ -126,7 +135,7 @@ export function insertNewSession({ sessionId, id, password, email }) {
       .insertOne({
         expireAt: expire,
         logEvent: 1,
-        logMessage: "Success!",
+        logMessage: "Session Removed!",
         sessionId,
         id,
         password,
@@ -168,7 +177,7 @@ export function validationCreate({ type, value, reference }) {
       .insertOne({
         expireAt: expire,
         logEvent: 1,
-        logMessage: "Success!",
+        logMessage: "Validation Code Removed!",
         reference,
         [type]: value,
       })

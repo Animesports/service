@@ -18,6 +18,7 @@
   "payment": {
     "expireAt": "object",
     "value": "number",
-    "verified": "boolean"
+    "verified": "boolean",
+    "season": "string"
   }
 }

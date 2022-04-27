@@ -43,11 +43,21 @@ router.use(session.router);
 
 // Season Control
 router.use((req, res, next) => {
+  const date = new Date();
   res.locals.season = {
-    day: new Date().getUTCDate(),
-    month: new Date().getMonth() + 1,
-    year: new Date().getFullYear(),
+    day: date.getUTCDate(),
+    month: date.getUTCMonth() + 1,
+    year: date.getUTCFullYear(),
   };
+
+  date.setMonth(date.getMonth() + 1);
+
+  res.locals.nxtSeason = {
+    day: date.getUTCDate(),
+    month: date.getUTCMonth() + 1,
+    year: date.getUTCFullYear(),
+  };
+
   next();
 });
 

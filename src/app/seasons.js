@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  getAllPaymentBySeason,
   getSeasonById,
   insertNewSeason,
   updateSeason,
@@ -12,7 +13,15 @@ router.get("/", (req, res) => {
   const { month, year } = res.locals.season;
 
   getSeasonById({ id: `${month}/${year}` }).then(
-    (season) => {
+    async (season) => {
+      await getAllPaymentBySeason({ season: `${month}/${year}` }).then(
+        (payments) => {
+          season.amount = payments
+            .map((payment) => payment.value)
+            .reduce((a, b) => a + b);
+        }
+      );
+
       res.json(season);
     },
     () => {
