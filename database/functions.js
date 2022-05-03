@@ -126,7 +126,7 @@ export function insertNewSession({ sessionId, id, password, email }) {
     const expire = new Date();
     expire.setDate(expire.getDay() + 2);
 
-    await Connection.validation.createIndex(
+    await Connection.session.createIndex(
       { expireAt: 1 },
       { expireAfterSeconds: 0 }
     );
