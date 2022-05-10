@@ -124,7 +124,7 @@ export function updateSession({ sessionId, props }) {
 export function insertNewSession({ sessionId, id, password, email }) {
   return new Promise(async (accept, reject) => {
     const expire = new Date();
-    expire.setDate(expire.getDay() + 2);
+    expire.setDate(expire.getDate() + 2);
 
     await Connection.session.createIndex(
       { expireAt: 1 },
@@ -231,10 +231,10 @@ export function updateClient({ id, props }) {
   });
 }
 
-export function removeClient({ email }) {
+export function removeClient({ email, name, id }) {
   return new Promise((resolve, reject) => {
     Connection.clients
-      .deleteOne({ "data.email.address": email })
+      .deleteOne({ "data.email.address": email, "data.name": name, id })
       .then(resolve, reject);
   });
 }
