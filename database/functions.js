@@ -1,6 +1,58 @@
 import { Connection } from "./connection.js";
 Connection.check();
 
+export function searchSoccerGame({ id }) {
+  return new Promise((resolve, reject) => {
+    Connection.games
+      .findOne({
+        id,
+      })
+      .then(resolve, reject);
+  });
+}
+
+export function getAllSoccerGames(filter) {
+  return new Promise((resolve, reject) => {
+    Connection.games
+      .find(filter ?? {})
+      .toArray()
+      .then(resolve, reject);
+  });
+}
+
+export async function insertNewSoccerGame({ id, teams, date, reference }) {
+  const expire = new Date();
+  expire.setMonth(expire.getMonth() + 1);
+
+  await Connection.games.createIndex(
+    { expireAt: 1 },
+    { expireAfterSeconds: 0 }
+  );
+
+  const game = {
+    expireAt: expire,
+    logEvent: 1,
+    logMessage: "Season Removed!",
+
+    date,
+    id,
+    teams,
+    reference,
+    status: "opened",
+    score: {
+      visited: 0,
+      visitor: 0,
+    },
+    entries: [],
+  };
+
+  return new Promise((resolve, reject) => {
+    Connection.games.insertOne(game).then((re) => {
+      resolve({ ...re, game });
+    }, reject);
+  });
+}
+
 export function getSeasonById({ id }) {
   return new Promise((resolve, reject) => {
     Connection.seasons.findOne({ id }).then(resolve, reject);

@@ -2,10 +2,31 @@ import {
   findClientId,
   searchPayment,
   searchSessionById,
+  searchSoccerGame,
   validationSearcher,
 } from "../database/functions.js";
 import { v5 as uuidv5, v4 as uuidv4 } from "uuid";
 import TokenGenerator from "uuid-token-generator";
+
+export function createGameId({ visited, visitor }) {
+  return new Promise((accept, reject) => {
+    let times = 10;
+
+    (async function generate() {
+      times--;
+
+      const gameId = `${visited.id}${visitor.id}-${Math.round(
+        1000 + Math.random() * 9999
+      )}`;
+
+      await searchSoccerGame({ id: gameId }).then((game) => {
+        if (!game?.id) return accept(gameId);
+        if (times <= 0) return reject(new Error("max-generate-times"));
+        setTimeout(generate, 10);
+      });
+    })();
+  });
+}
 
 export function generatePaymentId({ identifier }) {
   return new Promise((accept, reject) => {

@@ -47,6 +47,7 @@ export class Connection {
     this.session = this.db.collection("session");
     this.seasons = this.db.collection("seasons");
     this.payments = this.db.collection("payments");
+    this.games = this.db.collection("games");
   }
 }
 

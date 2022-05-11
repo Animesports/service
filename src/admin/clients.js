@@ -17,10 +17,11 @@ router.get("/all", async (req, res) => {
 });
 
 router.delete("/", async (req, res) => {
-  const { name, email } = req.body;
-  if (!name || !email) return responseError(res, 400);
+  console.info("delete");
+  const { name, email, id } = req.body;
+  if (!name || !email || !id) return responseError(res, 400);
 
-  await removeClient({ email, name }).then(
+  await removeClient({ email, name, id }).then(
     ({ deletedCount }) => {
       res.json({ email, deleted: !!deletedCount });
     },

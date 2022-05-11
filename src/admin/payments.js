@@ -3,7 +3,6 @@ import {
   deletePayment,
   getAllPayments,
   updatePayment,
-  updateSeason,
   getAllPaymentWithId,
 } from "../../database/functions.js";
 import { ObjToArr, ArrToObj } from "../../utils/converter.js";
