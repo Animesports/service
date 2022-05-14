@@ -1,6 +1,21 @@
 import { Connection } from "./connection.js";
 Connection.check();
 
+export function updateSoccerGame({ id, props }) {
+  return new Promise((resolve, reject) => {
+    Connection.games
+      .updateOne(
+        {
+          id,
+        },
+        {
+          $set: props,
+        }
+      )
+      .then(resolve, reject);
+  });
+}
+
 export function searchSoccerGame({ id }) {
   return new Promise((resolve, reject) => {
     Connection.games

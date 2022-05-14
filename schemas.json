@@ -20,5 +20,12 @@
     "value": "number",
     "verified": "boolean",
     "season": "string"
+  },
+  "game": {
+    "teams.visited": "object",
+    "teams.visitor": "object",
+    "score": "object",
+    "date": "string",
+    "state": "string"
   }
 }

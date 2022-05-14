@@ -75,7 +75,7 @@ router.patch("/:paymentId", async (req, res) => {
   if (acceptProps.length <= 0) return responseError(res, 400);
 
   await updatePayment({ paymentId, props: ArrToObj(acceptProps) }).then(
-    async ({ acknowledged, modifiedCount }) => {
+    ({ acknowledged, modifiedCount }) => {
       res.json({ acknowledged, modifiedCount });
     },
     () => {
