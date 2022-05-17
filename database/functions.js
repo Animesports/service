@@ -1,6 +1,42 @@
 import { Connection } from "./connection.js";
 Connection.check();
 
+export function updateGameEntry({ gameId, id, entry }) {
+  return new Promise((resolve, reject) => {
+    Connection.games
+      .updateOne(
+        {
+          id: gameId,
+          "entries.id": id,
+        },
+        {
+          $set: {
+            "entries.$.visited": entry.visited,
+            "entries.$.visitor": entry.visitor,
+          },
+        }
+      )
+      .then(resolve, reject);
+  });
+}
+
+export function createNewGameEntry({ gameId, id, entry }) {
+  return new Promise((resolve, reject) => {
+    Connection.games
+      .updateOne(
+        {
+          id: gameId,
+        },
+        {
+          $push: {
+            entries: { id, visited: entry.visited, visitor: entry.visitor },
+          },
+        }
+      )
+      .then(resolve, reject);
+  });
+}
+
 export function deleteSoccerGame({ id }) {
   return new Promise((resolve, reject) => {
     Connection.games

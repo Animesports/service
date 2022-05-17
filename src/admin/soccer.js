@@ -67,7 +67,9 @@ router.patch("/score/:id", async (req, res) => {
   const id = req.params.id;
   const { visited, visitor } = req.body.score;
 
-  if (!visited == null || !visitor == null) return responseError(res, 400);
+  if (typeof visited !== "number" || typeof visitor !== "number") {
+    return responseError(res, 400);
+  }
 
   if ([visitor, visited].every((v) => typeof v === "number") === false) {
     return responseError(res, 401);

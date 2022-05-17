@@ -7,6 +7,7 @@ import appMailer from "./app/mailer.js";
 import appSoccer from "./app/soccer.js";
 import clients from "./clients.js";
 import payments from "./payments.js";
+import soccer from "./soccer.js";
 
 export const adminRoutes = { adminClients, adminPayments, adminSoccer };
 
@@ -15,4 +16,5 @@ export const appRoutes = { appClients, appMailer, appSeasons, appSoccer };
 export default {
   clients,
   payments,
+  soccer,
 };
