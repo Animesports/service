@@ -3,12 +3,14 @@ import express from "express";
 import dotenv from "dotenv";
 import responseError from "../utils/errors.js";
 import { validateClient } from "../database/functions.js";
-import routes, { adminRoutes, appRoutes } from "../src/routes.js";
+import routes, { adminRoutes, appRoutes } from "./routes.js";
 import { Connection } from "../database/connection.js";
-import override from "../src/override.js";
+import override from "./override.js";
 import cors from "cors";
 import crypto from "./crypto.js";
 import session from "./session.js";
+
+import { Server } from "socket.io";
 
 dotenv.config();
 const router = express();
@@ -114,7 +116,15 @@ router.use((_req, res) => {
 
 // Server Listener
 const httpServer = http.createServer(router);
+
+const io = new Server(httpServer);
+
+io.on("connection", (socket) => {
+  socket.emit("hello", { data: "here" });
+});
+
 const PORT = process.env.PORT ?? 6060;
+
 httpServer.listen(PORT, () =>
   console.log(`The server is running on port ${PORT}`)
 );
