@@ -24,8 +24,6 @@
   "game": {
     "teams.visited": "object",
     "teams.visitor": "object",
-    "score": "object",
-    "date": "string",
-    "state": "string"
+    "date": "string"
   }
 }

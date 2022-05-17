@@ -45,7 +45,6 @@ router.patch("/:paymentId", async (req, res) => {
     const lastExpire =
       filteredPayments[filteredPayments.length - 1]?.expireAt ?? null;
 
-    console.info({ filteredPayments, lastExpire, props });
     if (lastExpire) {
       lastExpire.setMonth(lastExpire.getMonth() + 1);
       props.expireAt = lastExpire;

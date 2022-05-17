@@ -1,6 +1,16 @@
 import { Connection } from "./connection.js";
 Connection.check();
 
+export function deleteSoccerGame({ id }) {
+  return new Promise((resolve, reject) => {
+    Connection.games
+      .deleteOne({
+        id,
+      })
+      .then(resolve, reject);
+  });
+}
+
 export function updateSoccerGame({ id, props }) {
   return new Promise((resolve, reject) => {
     Connection.games

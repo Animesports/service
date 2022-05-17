@@ -11,7 +11,12 @@ router.use((req, res, next) => {
     "Authorization, Access-Control-Allow-Headers, Access-Control-Allow-Origin, Access-Control-Allow-Credentials, Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers"
   );
   if (req.method === "OPTIONS") {
-    res.setHeader("Access-Control-Allow-Origin", "https://animesports.cf/");
+    res.setHeader(
+      "Access-Control-Allow-Origin",
+      process.env.NODE_ENV === "development"
+        ? "http://localhost:3000"
+        : "https://animesports.cf"
+    );
     res.setHeader("Access-Control-Allow-Methods", `POST,DELETE,GET,PATCH`);
     return res.status(200).json({
       methods: "POST,DELETE,GET,PATCH",
