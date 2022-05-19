@@ -320,6 +320,7 @@ export function insertNewClient({ name, email, password, id }) {
           },
           pix: null,
           password,
+          picture: null,
           admin: false,
         },
         config: {

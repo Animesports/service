@@ -2,6 +2,8 @@ import express from "express";
 import {
   findClientEmail,
   getAllClientDataWithId,
+  getAllClients,
+  getAllPayments,
   insertNewClient,
   insertNewSession,
   validateClientCredentials,
@@ -10,6 +12,36 @@ import responseError from "../../utils/errors.js";
 import { generateId, generateSessionId } from "../../utils/token.js";
 
 const router = express();
+
+router.get("/", async (req, res) => {
+  const { month, year } = res.locals.season;
+
+  await getAllPayments().then(async (payments) => {
+    if (!Array.isArray(payments)) return responseError(res, 501);
+
+    payments = payments
+      .filter((pay) => pay.season === `${month}/${year}`)
+      .map((pay) => pay.reference);
+
+    await getAllClients().then((clients) => {
+      if (!Array.isArray(clients)) return responseError(res, 501);
+
+      clients = clients.filter((client) => payments.includes(client.id));
+
+      res.json(
+        clients.map(({ id, ["data"]: { name, picture } }) => {
+          return {
+            id,
+            data: {
+              name,
+              picture,
+            },
+          };
+        })
+      );
+    });
+  });
+});
 
 router.post("/", async (req, res) => {
   const { email, password, name } = req.body ?? {};
