@@ -119,12 +119,17 @@ const httpServer = http.createServer(router);
 
 const io = new Server(httpServer);
 
+Connection.subscribeEmitter(io);
+
 io.on("connection", (socket) => {
-  socket.emit("hello", { data: "here" });
+  Connection.subscribeListener(socket);
+
+  socket.on("disconnect", () => {
+    Connection.removeListener(socket);
+  });
 });
 
 const PORT = process.env.PORT ?? 6060;
-
 httpServer.listen(PORT, () =>
   console.log(`The server is running on port ${PORT}`)
 );

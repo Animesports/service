@@ -11,6 +11,8 @@ let mongoClient = new MongoClient(process.env.SERVICE_URL, {
 let mongoDb = new Db(mongoClient, "animesports");
 
 export class Connection {
+  static listeners = {};
+
   static async open() {
     try {
       console.info("> DB: Opening a connection");
@@ -48,6 +50,22 @@ export class Connection {
     this.seasons = this.db.collection("seasons");
     this.payments = this.db.collection("payments");
     this.games = this.db.collection("games");
+  }
+
+  static subscribeListener(listener) {
+    this.listeners[listener.id] = listener;
+  }
+
+  static removeListener(listener) {
+    delete this.listeners[listener.id];
+  }
+
+  static subscribeEmitter(emitter) {
+    this.emitter = emitter;
+  }
+
+  static emit(event, data) {
+    this.emitter?.emit(event, data);
   }
 }
 

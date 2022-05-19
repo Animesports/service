@@ -1,4 +1,5 @@
 import express from "express";
+import { Connection } from "../../database/connection.js";
 import {
   getAllPaymentBySeason,
   getSeasonById,
@@ -38,14 +39,22 @@ router.post("/close", (req, res) => {
       running: false,
     },
   }).then(
-    () => {
+    ({ acknowledged }) => {
+      if (!acknowledged) return responseError(res, 501);
+
       // Definir vencedores usando as Ref de jogos com o resultado e usando ID com mais pontos.
       // Gerar notificação de vencedores
       // Pagamentos de saída para vencedores
+
+      Connection.emit("update-season", {
+        id: `${month}/${year}`,
+        running: false,
+      });
+
       res.end();
     },
     (err) => {
-      res.status(501).json({ err });
+      responseError(res, 501);
     }
   );
 });
@@ -54,15 +63,16 @@ router.post("/open", (req, res) => {
   const { month, year } = req.body.utc_date ?? res.locals.season;
 
   insertNewSeason({ id: `${month}/${year}` }).then(
-    () => {
+    ({ acknowledged, season }) => {
+      if (!acknowledged) return responseError(res, 501);
+
+      Connection.emit("update-season", season);
       res.end();
     },
-    (err) => {
-      res.status(501).json({ err });
+    () => {
+      responseError(res, 501);
     }
   );
-
-  res.end();
 });
 
 const appSeasons = { router, methods: "" };

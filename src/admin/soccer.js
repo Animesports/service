@@ -8,8 +8,9 @@ import {
 import responseError from "../../utils/errors.js";
 import { createGameId } from "../../utils/token.js";
 import schemas from "../../schemas.json" assert { type: "json" };
-import { ArrToObj, ObjToArr } from "../../utils/converter.js";
+import { ArrToObj, DotObj, ObjToArr } from "../../utils/converter.js";
 import { getGameStatus } from "../../utils/soccer.js";
+import { Connection } from "../../database/connection.js";
 
 const router = express();
 
@@ -17,17 +18,26 @@ router.patch("/close/:id", async (req, res) => {
   const id = req.params.id;
   const score = req.body.score;
 
-  //TODO: Antes de fechar, verificar se ele está em andamento
-  if (!score.visited || !score.visitor) return responseError(res, 400);
+  if (typeof score.visited !== "number" || typeof score.visitor !== "number") {
+    return responseError(res, 400);
+  }
 
-  await updateSoccerGame({ id, props: { status: "closed", score } }).then(
-    ({ acknowledged }) => {
-      return res.json({ acknowledged });
-    },
-    () => {
-      responseError(res, 501);
-    }
-  );
+  await searchSoccerGame({ id }).then(async (game) => {
+    if (getGameStatus(game) !== "running") return responseError(res, 403);
+
+    await updateSoccerGame({ id, props: { status: "closed", score } }).then(
+      ({ acknowledged }) => {
+        if (!acknowledged) return responseError(res, 501);
+        console.info("a1");
+        Connection.emit("update-game", { ...game, score, status: "closed" });
+
+        return res.json({ acknowledged });
+      },
+      () => {
+        responseError(res, 501);
+      }
+    );
+  });
 });
 
 router.delete("/:id", async (req, res) => {
@@ -40,6 +50,9 @@ router.delete("/:id", async (req, res) => {
       case "opened":
         await deleteSoccerGame({ id }).then(
           ({ deletedCount }) => {
+            if (!!deletedCount) {
+              Connection.emit("delete-game", game);
+            }
             return res.json({ deleted: !!deletedCount, id });
           },
           () => {
@@ -50,6 +63,10 @@ router.delete("/:id", async (req, res) => {
       case "running":
         await updateSoccerGame({ id, props: { status: "canceled" } }).then(
           ({ acknowledged }) => {
+            if (!acknowledged) return responseError(res, 501);
+            console.info("a2");
+            Connection.emit("update-game", { ...game, status: "canceled" });
+
             return res.json({ acknowledged });
           },
           () => {
@@ -82,6 +99,13 @@ router.patch("/score/:id", async (req, res) => {
 
     await updateSoccerGame({ id, props: { score: { visited, visitor } } }).then(
       ({ acknowledged }) => {
+        if (!acknowledged) return responseError(res, 501);
+        console.info("a3");
+        Connection.emit("update-game", {
+          ...game,
+          score: { visited, visitor },
+        });
+
         res.json({
           acknowledged,
         });
@@ -102,15 +126,25 @@ router.patch("/:id", async (req, res) => {
     return schemas.game[key] && typeof value === schemas.game[key];
   });
 
-  await updateSoccerGame({ id, props: ArrToObj(acceptProps) }).then(
-    ({ acknowledged }) => {
-      res.json({ acknowledged, modified: ArrToObj(acceptProps) });
-    },
-    () => {
-      responseError(res, 501);
-    }
-  );
-  res.end();
+  await searchSoccerGame({ id }).then(async (game) => {
+    if (!game.id) return responseError(res, 510);
+
+    await updateSoccerGame({ id, props: ArrToObj(acceptProps) }).then(
+      ({ acknowledged }) => {
+        if (!acknowledged) return responseError(res, 501);
+
+        Connection.emit("update-game", {
+          id,
+          ...DotObj(ArrToObj(acceptProps)),
+        });
+
+        res.json({ acknowledged, modified: DotObj(ArrToObj(acceptProps)) });
+      },
+      () => {
+        responseError(res, 501);
+      }
+    );
+  });
 });
 
 router.post("/", async (req, res) => {
@@ -127,6 +161,10 @@ router.post("/", async (req, res) => {
         reference: `${month}/${year}`,
       }).then(
         ({ acknowledged, game }) => {
+          if (!acknowledged) responseError(res, 501);
+
+          Connection.emit("insert-game", game);
+
           res.json({
             success: acknowledged,
             game,

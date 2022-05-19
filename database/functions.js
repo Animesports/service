@@ -131,17 +131,19 @@ export function insertNewSeason({ id }) {
       { expireAfterSeconds: 0 }
     );
 
-    Connection.seasons
-      .insertOne({
-        expireAt: expire,
-        running: true,
-        logEvent: 1,
-        logMessage: "Season Removed!",
-        id,
-        references: [],
-        ticket: 3.5,
-      })
-      .then(resolve, reject);
+    const season = {
+      expireAt: expire,
+      running: true,
+      logEvent: 1,
+      logMessage: "Season Removed!",
+      id,
+      references: [],
+      ticket: 3.5,
+    };
+
+    Connection.seasons.insertOne(season).then(({ acknowledged }) => {
+      resolve({ acknowledged, season });
+    }, reject);
   });
 }
 

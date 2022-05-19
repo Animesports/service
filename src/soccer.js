@@ -6,6 +6,7 @@ import {
 } from "../database/functions.js";
 import responseError from "../utils/errors.js";
 import { getGameStatus } from "../utils/soccer.js";
+import { Connection } from "../database/connection.js";
 
 const router = express();
 
@@ -27,6 +28,12 @@ router.post("/entry/:gameId", async (req, res) => {
     func({ gameId, id, entry: { visited, visitor } }).then(
       ({ acknowledged }) => {
         if (!acknowledged) return responseError(res, 501);
+
+        Connection.emit("update-entry", {
+          id: game.id,
+          entry: { id, visited, visitor },
+        });
+
         res.json({ acknowledged });
       }
     );
