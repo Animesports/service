@@ -187,6 +187,36 @@ export function deletePayment({ paymentId }) {
   });
 }
 
+export function insertAwardPayments({ winners, payIdPrefix }) {
+  return new Promise(async (resolve, reject) => {
+    const expire = new Date();
+
+    expire.setMonth(expire.getMonth() + 1);
+
+    await Connection.payments.createIndex(
+      { expireAt: 1 },
+      { expireAfterSeconds: 0 }
+    );
+
+    Connection.payments
+      .insertMany(
+        winners.map((winner, position) => {
+          return {
+            expireAt: expire,
+            logEvent: 1,
+            logMessage: "Payment Removed!",
+            value: -winner.award,
+            type: "send",
+            verified: false,
+            id: `${payIdPrefix}${position + 1}`,
+            reference: winner.id,
+          };
+        })
+      )
+      .then(resolve, reject);
+  });
+}
+
 export function insertNewPayment({ value, paymentId, id }) {
   return new Promise(async (resolve, reject) => {
     const expire = new Date();
