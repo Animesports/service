@@ -50,6 +50,7 @@ export class Connection {
     this.seasons = this.db.collection("seasons");
     this.payments = this.db.collection("payments");
     this.games = this.db.collection("games");
+    this.notifications = this.db.collection("notifications");
   }
 
   static subscribeListener(listener) {

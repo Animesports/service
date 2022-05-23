@@ -4,5 +4,6 @@
   "403": "Forbidden: This operation is not allowed for this request",
   "404": "Not Found: Unknown address",
   "501": "Server Error: Internal error during processing",
-  "510": "Gone: The requested document is not available"
+  "510": "Gone: The requested document is not available",
+  "406": "Not Acceptable: Operation refused by the server due to lack of some requirement."
 }

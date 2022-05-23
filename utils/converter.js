@@ -35,3 +35,30 @@ export function DotObj(obj) {
 
   return Object.fromEntries(converted);
 }
+
+export function currency() {
+  return {
+    getCents: (number) =>
+      `00${(number - Math.trunc(number)).toFixed(2) * 100}`.slice(-2),
+    getReals: (number) => Math.trunc(number),
+    get: (number) =>
+      `R$ ${currency().getReals(number)},${currency().getCents(number)}`,
+  };
+}
+
+export function month(number) {
+  return [
+    "janeiro",
+    "fevereiro",
+    "março",
+    "abril",
+    "maio",
+    "junho",
+    "julho",
+    "agosto",
+    "setembro",
+    "outubro",
+    "novembro",
+    "dezembro",
+  ][number - 1];
+}

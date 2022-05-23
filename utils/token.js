@@ -1,5 +1,6 @@
 import {
   findClientId,
+  getNotification,
   searchPayment,
   searchSessionById,
   searchSoccerGame,
@@ -7,6 +8,24 @@ import {
 } from "../database/functions.js";
 import { v5 as uuidv5, v4 as uuidv4 } from "uuid";
 import TokenGenerator from "uuid-token-generator";
+
+export function generateNotifyId() {
+  return new Promise((accept, reject) => {
+    let times = 10;
+
+    (async function generate() {
+      times--;
+
+      const notifyId = `${uuidv4()}`;
+
+      await getNotification({ id: notifyId }).then((notification) => {
+        if (!notification?.id) return accept(notifyId);
+        if (times <= 0) return reject(new Error("max-generate-times"));
+        setTimeout(generate, 10);
+      });
+    })();
+  });
+}
 
 export function createGameId({ visited, visitor }) {
   return new Promise((accept, reject) => {

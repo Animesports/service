@@ -1,6 +1,49 @@
 import { Connection } from "./connection.js";
 Connection.check();
 
+export function getAllNotifications() {
+  return new Promise(async (resolve, reject) => {
+    Connection.notifications.find({}).toArray().then(resolve, reject);
+  });
+}
+
+export function getNotification({ id }) {
+  return new Promise(async (resolve, reject) => {
+    Connection.notifications.findOne({ id }).then(resolve, reject);
+  });
+}
+
+export function updateNotification({ id, props, func }) {
+  return new Promise(async (resolve, reject) => {
+    Connection.notifications
+      .updateOne({ id }, { [`$${func ?? "set"}`]: props })
+      .then(resolve, reject);
+  });
+}
+
+export function newNotification({ id, title, message, ...params }) {
+  return new Promise(async (resolve, reject) => {
+    const expire = new Date();
+    expire.setMonth(expire.getMonth() + 1);
+
+    await Connection.notifications.createIndex(
+      { expireAt: 1 },
+      { expireAfterSeconds: 0 }
+    );
+
+    Connection.notifications
+      .insertOne({
+        expireAt: expire,
+        id,
+        title,
+        message,
+        ...params,
+        readlist: [],
+      })
+      .then(resolve, reject);
+  });
+}
+
 export function updateGameEntry({ gameId, id, entry }) {
   return new Promise((resolve, reject) => {
     Connection.games
@@ -43,6 +86,22 @@ export function deleteSoccerGame({ id }) {
       .deleteOne({
         id,
       })
+      .then(resolve, reject);
+  });
+}
+
+export function updateManyGames({ filter, props }) {
+  return new Promise((resolve, reject) => {
+    Connection.games
+      .updateMany(
+        {
+          ...filter,
+        },
+        {
+          $set: props,
+        }
+      )
+
       .then(resolve, reject);
   });
 }
@@ -138,7 +197,7 @@ export function insertNewSeason({ id }) {
       logMessage: "Season Removed!",
       id,
       references: [],
-      ticket: 3.5,
+      ticket: process.env.APP_TICKET ?? 3.5,
     };
 
     Connection.seasons.insertOne(season).then(({ acknowledged }) => {
@@ -151,6 +210,14 @@ export function updateSeason({ id, func, props }) {
   return new Promise((resolve, reject) => {
     Connection.seasons
       .updateOne({ id }, { [`$${func ?? "set"}`]: props })
+      .then(resolve, reject);
+  });
+}
+
+export function getClientSeasonPayment({ season, id }) {
+  return new Promise(async (resolve, reject) => {
+    Connection.payments
+      .findOne({ season, reference: id })
       .then(resolve, reject);
   });
 }
@@ -188,6 +255,8 @@ export function deletePayment({ paymentId }) {
 }
 
 export function insertAwardPayments({ winners, payIdPrefix }) {
+  winners = winners.filter((w) => typeof w === "object");
+
   return new Promise(async (resolve, reject) => {
     const expire = new Date();
 

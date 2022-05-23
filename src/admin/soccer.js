@@ -152,6 +152,8 @@ router.post("/", async (req, res) => {
   const { month, year } = res.locals.season;
   if (!visited.id || !visitor.id || !date) return responseError(res, 401);
 
+  //TODO: Não criar jogos para temporadas encerradas
+
   await createGameId({ visited, visitor }).then(
     async (id) => {
       await insertNewSoccerGame({

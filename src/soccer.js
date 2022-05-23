@@ -1,6 +1,7 @@
 import express from "express";
 import {
   createNewGameEntry,
+  getClientSeasonPayment,
   searchSoccerGame,
   updateGameEntry,
 } from "../database/functions.js";
@@ -9,6 +10,16 @@ import { getGameStatus } from "../utils/soccer.js";
 import { Connection } from "../database/connection.js";
 
 const router = express();
+
+router.use((req, res, next) => {
+  const { year, month } = res.locals.season;
+  const id = res.locals.id;
+
+  getClientSeasonPayment({ season: `${month}/${year}`, id }).then((payment) => {
+    if (payment?.id) return next();
+    return responseError(res, 406);
+  });
+});
 
 router.post("/entry/:gameId", async (req, res) => {
   const gameId = req.params.gameId;

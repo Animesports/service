@@ -8,13 +8,23 @@ import appSoccer from "./app/soccer.js";
 import clients from "./clients.js";
 import payments from "./payments.js";
 import soccer from "./soccer.js";
+import notifications from "./notifications.js";
+import appNotifications from "./app/notifications.js";
 
 export const adminRoutes = { adminClients, adminPayments, adminSoccer };
 
-export const appRoutes = { appClients, appMailer, appSeasons, appSoccer };
+export const appRoutes = {
+  appClients,
+  appMailer,
+  appSeasons,
+  appSoccer,
+  appNotifications,
+};
 
 export default {
   clients,
   payments,
   soccer,
+  notifications,
+  appNotifications,
 };
