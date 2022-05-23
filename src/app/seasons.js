@@ -87,7 +87,8 @@ router.post("/close", async (req, res) => {
                     payments.map((p) => p.reference).includes(c.id)
                   );
 
-                  const tax = amount < 10.5 ? 0 : process.env.APP_TAX ?? 0.4;
+                  const tax =
+                    amount < 10.5 ? 0 : Number(process.env.APP_TAX) ?? 0.4;
                   const appAmount = amount * tax;
                   const awardAmount = amount * (1 - tax);
                   const weight = [[1], [0.65, 0.35], [0.6, 0.3, 0.1]];

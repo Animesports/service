@@ -197,7 +197,7 @@ export function insertNewSeason({ id }) {
       logMessage: "Season Removed!",
       id,
       references: [],
-      ticket: process.env.APP_TICKET ?? 3.5,
+      ticket: Number(process.env.APP_TICKET) ?? 3.5,
     };
 
     Connection.seasons.insertOne(season).then(({ acknowledged }) => {
