@@ -21,12 +21,15 @@ router.get("/", async (req, res) => {
 router.post("/", async (req, res) => {
   const season = res.locals.season;
   const id = res.locals.id;
+  const verified = res.locals.verified;
+
   const { identifier } = req.body;
 
   const value = (await getSeasonById({ id: `${season.month}/${season.year}` }))
     ?.ticket;
 
   if (!identifier || !value) return responseError(res, 400);
+  if (!verified) return responseError(res, 403);
 
   await generatePaymentId({ identifier }).then(
     async (paymentId) => {

@@ -460,7 +460,11 @@ export function validateClient({ id, email, password }) {
     Connection.clients
       .findOne({ id, "data.email.address": email, "data.password": password })
       .then((client) => {
-        resolve({ id: client?.id, admin: client?.data?.admin });
+        resolve({
+          id: client?.id,
+          admin: client?.data?.admin,
+          verified: client?.data?.email?.verified,
+        });
       }, reject);
   });
 }

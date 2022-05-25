@@ -24,11 +24,15 @@ router.use((req, res, next) => {
 router.post("/entry/:gameId", async (req, res) => {
   const gameId = req.params.gameId;
   const id = res.locals.id;
+  const verified = res.locals.verified;
+
   const { visited, visitor } = req.body;
 
   if (typeof visited !== "number" || typeof visitor !== "number") {
     return responseError(res, 400);
   }
+
+  if (!verified) return responseError(res, 403);
 
   await searchSoccerGame({ id: gameId }).then((game) => {
     if (getGameStatus(game) !== "opened") return responseError(res, 403);

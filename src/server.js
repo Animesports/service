@@ -70,10 +70,11 @@ router.use((req, res, next) => {
   const { id, email, password } = res.locals.session;
 
   validateClient({ id, email, password }).then(
-    ({ id, admin }) => {
+    ({ id, admin, verified }) => {
       if (!id) return responseError(res, 401);
       res.locals.id = id;
       res.locals.admin = admin;
+      res.locals.verified = verified;
       next();
     },
     () => responseError(res, 500)
