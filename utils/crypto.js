@@ -33,51 +33,6 @@ class NodeEncoder {
   }
 }
 
-class ClientRSA {
-  constructor({ bits }) {
-    this.RSA = new NodeRSA({ b: bits });
-  }
-
-  export() {
-    return tools.toBase64(this.RSA.exportKey("public"));
-  }
-
-  encrypt(message) {
-    try {
-      return this.RSA.encrypt(message, "base64");
-    } catch {
-      return null;
-    }
-  }
-
-  decrypt(message) {
-    try {
-      return this.RSA.decrypt(message, "utf8");
-    } catch {
-      return null;
-    }
-  }
-}
-
-class ServerRSA {
-  constructor(serverKey) {
-    this.number = Math.round(Math.random() * 1000);
-    this.RSA = new NodeRSA(tools.toUTF(serverKey));
-  }
-
-  encrypt(message) {
-    try {
-      return this.RSA.encrypt(message, "base64");
-    } catch {
-      return null;
-    }
-  }
-}
-
-export function clientEncoder(serverKey, callback) {
-  callback(new ClientRSA({ bits: 2048 }), new ServerRSA(serverKey), tools);
-}
-
 export function serverEncoder(callback) {
   callback(new NodeEncoder(), tools);
 }
