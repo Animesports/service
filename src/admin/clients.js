@@ -1,13 +1,14 @@
 import express from "express";
 import { getAllClients, removeClient } from "../../database/functions.js";
 import responseError from "../../utils/errors.js";
+import { onlyUserBasic } from "../../utils/projections.js";
 import Response from "../../utils/response.js";
 
 const router = express();
 
 router.get("/all", async (req, res) => {
   await getAllClients({
-    projection: { _id: 0, config: 0, "data.password": 0 },
+    projection: onlyUserBasic(),
   }).then(
     (clients) => {
       if (!Array.isArray(clients)) return responseError(res, 501);

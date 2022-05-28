@@ -1,3 +1,9 @@
+import {
+  defaultProjection,
+  onlyEmail,
+  onlyId,
+  temporally,
+} from "../utils/projections.js";
 import { Connection } from "./connection.js";
 Connection.check();
 
@@ -7,10 +13,7 @@ export function getAllNotifications() {
       .find(
         {},
         {
-          projection: {
-            _id: 0,
-            expireAt: 0,
-          },
+          projection: temporally(),
         }
       )
       .toArray()
@@ -24,12 +27,7 @@ export function getNotification({ id }) {
       .findOne(
         { id },
         {
-          projection: {
-            _id: 0,
-            logEvent: 0,
-            logMessage: 0,
-            expireAt: 0,
-          },
+          projection: temporally(),
         }
       )
       .then(resolve, reject);
@@ -152,12 +150,7 @@ export function searchSoccerGame({ id }) {
           id,
         },
         {
-          projection: {
-            _id: 0,
-            logEvent: 0,
-            logMessage: 0,
-            expireAt: 0,
-          },
+          projection: temporally(),
         }
       )
       .then(resolve, reject);
@@ -168,12 +161,7 @@ export function getAllSoccerGames(filter) {
   return new Promise((resolve, reject) => {
     Connection.games
       .find(filter ?? {}, {
-        projection: {
-          _id: 0,
-          logEvent: 0,
-          logMessage: 0,
-          expireAt: 0,
-        },
+        projection: temporally(),
       })
       .toArray()
       .then(resolve, reject);
@@ -219,12 +207,7 @@ export function getSeasonById({ id }) {
       .findOne(
         { id },
         {
-          projection: {
-            _id: 0,
-            logEvent: 0,
-            logMessage: 0,
-            expireAt: 0,
-          },
+          projection: temporally(),
         }
       )
       .then(resolve, reject);
@@ -272,13 +255,7 @@ export function getClientSeasonPayment({ season, id }) {
       .findOne(
         { season, reference: id },
         {
-          projection: {
-            _id: 0,
-            value: 0,
-            logEvent: 0,
-            expireAt: 0,
-            logMessage: 0,
-          },
+          projection: temporally(),
         }
       )
       .then(resolve, reject);
@@ -291,13 +268,7 @@ export function getAllPaymentBySeason({ season }) {
       .find(
         { season },
         {
-          projection: {
-            _id: 0,
-            value: 0,
-            logEvent: 0,
-            expireAt: 0,
-            logMessage: 0,
-          },
+          projection: temporally(),
         }
       )
       .toArray()
@@ -319,13 +290,7 @@ export function searchPayment({ paymentId }) {
           id: paymentId,
         },
         {
-          projection: {
-            _id: 0,
-            value: 0,
-            logEvent: 0,
-            expireAt: 0,
-            logMessage: 0,
-          },
+          projection: temporally(),
         }
       )
       .then(resolve, reject);
@@ -412,7 +377,15 @@ export function updatePayment({ paymentId, props }) {
 
 export function getAllPaymentWithId({ id }) {
   return new Promise((resolve, reject) => {
-    Connection.payments.find({ reference: id }).toArray().then(resolve, reject);
+    Connection.payments
+      .find(
+        { reference: id },
+        {
+          projection: defaultProjection(),
+        }
+      )
+      .toArray()
+      .then(resolve, reject);
   });
 }
 
@@ -453,12 +426,7 @@ export function searchSessionById({ sessionId }) {
       .findOne(
         { sessionId },
         {
-          projection: {
-            _id: 0,
-            logEvent: 0,
-            logMessage: 0,
-            expireAt: 0,
-          },
+          projection: temporally(),
         }
       )
       .then(accept, reject);
@@ -469,12 +437,7 @@ export function validationSearcher(parameter) {
   return new Promise((accept, reject) => {
     Connection.validation
       .findOne(parameter, {
-        projection: {
-          _id: 0,
-          logEvent: 0,
-          logMessage: 0,
-          expireAt: 0,
-        },
+        projection: temporally(),
       })
       .then(accept, reject);
   });
@@ -570,9 +533,7 @@ export function validateClient({ id, email, password }) {
       .findOne(
         { id, "data.email.address": email, "data.password": password },
         {
-          projection: {
-            _id: 0,
-          },
+          projection: defaultProjection(),
         }
       )
       .then((client) => {
@@ -592,9 +553,7 @@ export function validateClientCredentials({ email, password }) {
       .findOne(
         { "data.email.address": email, "data.password": password },
         {
-          projection: {
-            _id: 0,
-          },
+          projection: defaultProjection(),
         }
       )
       .then((client) => {
@@ -611,9 +570,7 @@ export function getAllClientDataWithId({ id }) {
       .findOne(
         { id },
         {
-          projection: {
-            _id: 0,
-          },
+          projection: defaultProjection(),
         }
       )
       .then(accept, reject);
@@ -627,14 +584,7 @@ export function findClientEmail({ email }) {
       .findOne(
         { "data.email.address": email },
         {
-          projection: {
-            _id: 0,
-            config: 0,
-            "data.name": 0,
-            "data.pix": 0,
-            "data.password": 0,
-            "data.admin": 0,
-          },
+          projection: onlyEmail(),
         }
       )
       .then((client) => {
@@ -650,11 +600,7 @@ export function findClientId({ id }) {
       .findOne(
         { id },
         {
-          projection: {
-            _id: 0,
-            data: 0,
-            config: 0,
-          },
+          projection: onlyId(),
         }
       )
       .then((client) => {

@@ -9,17 +9,13 @@ import { ObjToArr, ArrToObj } from "../../utils/converter.js";
 import responseError from "../../utils/errors.js";
 import schemas from "../../schemas.json" assert { type: "json" };
 import Response from "../../utils/response.js";
+import { temporally } from "../../utils/projections.js";
 
 const router = express();
 
 router.get("/all", async (req, res) => {
   await getAllPayments({
-    projection: {
-      _id: 0,
-      expireAt: 0,
-      logEvent: 0,
-      logMessage: 0,
-    },
+    projection: temporally(),
   }).then(
     (payments) => {
       if (!Array.isArray(payments)) return responseError(res, 501);

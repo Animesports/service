@@ -11,6 +11,7 @@ import {
 import responseError from "../../utils/errors.js";
 import { generateId, generateSessionId } from "../../utils/token.js";
 import Response from "../../utils/response.js";
+import { restrictedUser, temporally } from "../../utils/projections.js";
 
 const router = express();
 
@@ -18,12 +19,7 @@ router.get("/", async (req, res) => {
   const { month, year } = res.locals.season;
 
   await getAllPayments({
-    projection: {
-      _id: 0,
-      expireAt: 0,
-      logEvent: 0,
-      logMessage: 0,
-    },
+    projection: temporally(),
   }).then(async (payments) => {
     if (!Array.isArray(payments)) return responseError(res, 501);
 
@@ -32,13 +28,7 @@ router.get("/", async (req, res) => {
       .map((pay) => pay.reference);
 
     await getAllClients({
-      projection: {
-        _id: 0,
-        config: 0,
-        "data.pix": 0,
-        "data.email": 0,
-        "data.password": 0,
-      },
+      projection: restrictedUser(),
     }).then((clients) => {
       if (!Array.isArray(clients)) return responseError(res, 501);
 
