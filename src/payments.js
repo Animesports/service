@@ -7,13 +7,19 @@ import {
 import responseError from "../utils/errors.js";
 import { generatePaymentId } from "../utils/token.js";
 import Response from "../utils/response.js";
+import { temporally } from "../utils/projections.js";
 
 const router = express();
 
 router.get("/", async (req, res) => {
   const id = res.locals.id;
 
-  await getAllPaymentWithId({ id }).then((payments) => {
+  await getAllPaymentWithId(
+    { id },
+    {
+      projection: temporally(),
+    }
+  ).then((payments) => {
     if (!Array.isArray(payments)) return responseError(res, 510);
     Response(req, res, payments);
   });

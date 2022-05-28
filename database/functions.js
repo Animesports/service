@@ -375,13 +375,14 @@ export function updatePayment({ paymentId, props }) {
   });
 }
 
-export function getAllPaymentWithId({ id }) {
+export function getAllPaymentWithId({ id }, options) {
   return new Promise((resolve, reject) => {
     Connection.payments
       .find(
         { reference: id },
         {
           projection: defaultProjection(),
+          ...options,
         }
       )
       .toArray()
