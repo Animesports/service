@@ -6,3 +6,5 @@ export function plural(number) {
     },
   };
 }
+
+export function filterFields(object, fields) {}

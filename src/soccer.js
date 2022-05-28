@@ -8,6 +8,7 @@ import {
 import responseError from "../utils/errors.js";
 import { getGameStatus } from "../utils/soccer.js";
 import { Connection } from "../database/connection.js";
+import Response from "../utils/response.js";
 
 const router = express();
 
@@ -49,7 +50,7 @@ router.post("/entry/:gameId", async (req, res) => {
           entry: { id, visited, visitor },
         });
 
-        res.json({ acknowledged });
+        Response(req, res, { acknowledged });
       }
     );
   });

@@ -8,6 +8,7 @@ import responseError from "../utils/errors.js";
 import schemas from "../schemas.json" assert { type: "json" };
 import { ArrToObj, ObjToArr } from "../utils/converter.js";
 import { v2 as cloudinary } from "cloudinary";
+import Response from "../utils/response.js";
 
 const router = express();
 
@@ -16,7 +17,7 @@ router.get("/", async (req, res) => {
 
   await getAllClientDataWithId({ id }).then((user) => {
     if (!user?.id) return responseError(res, 400);
-    res.json(user);
+    Response(req, res, user);
   });
 });
 
@@ -45,7 +46,7 @@ router.post("/profile", (req, res) => {
     })
     .then(
       (response) => {
-        if (response?.public_id) return res.json(response);
+        if (response?.public_id) return Response(req, res, response);
         responseError(res, 501);
       },
       () => {
@@ -81,7 +82,7 @@ router.patch("/", async (req, res) => {
 
   await updateClient({ id, props: ArrToObj(acceptProps) }).then(
     ({ acknowledged, modifiedCount }) => {
-      res.json({ acknowledged, modifiedCount });
+      Response(req, res, { acknowledged, modifiedCount });
     },
     () => {
       responseError(res, 501);

@@ -8,14 +8,22 @@ import {
 import { ObjToArr, ArrToObj } from "../../utils/converter.js";
 import responseError from "../../utils/errors.js";
 import schemas from "../../schemas.json" assert { type: "json" };
+import Response from "../../utils/response.js";
 
 const router = express();
 
 router.get("/all", async (req, res) => {
-  await getAllPayments().then(
+  await getAllPayments({
+    projection: {
+      _id: 0,
+      expireAt: 0,
+      logEvent: 0,
+      logMessage: 0,
+    },
+  }).then(
     (payments) => {
       if (!Array.isArray(payments)) return responseError(res, 501);
-      res.json(payments);
+      Response(req, res, payments);
     },
     () => {
       responseError(res, 501);
@@ -75,7 +83,7 @@ router.patch("/:paymentId", async (req, res) => {
 
   await updatePayment({ paymentId, props: ArrToObj(acceptProps) }).then(
     ({ acknowledged, modifiedCount }) => {
-      res.json({ acknowledged, modifiedCount });
+      Response(req, res, { acknowledged, modifiedCount });
     },
     () => {
       responseError(res, 501);
@@ -90,7 +98,7 @@ router.delete("/:paymentId", async (req, res) => {
 
   await deletePayment({ paymentId }).then(
     ({ deletedCount }) => {
-      res.json({ paymentId, deleted: !!deletedCount });
+      Response(req, res, { paymentId, deleted: !!deletedCount });
     },
     () => {
       responseError(res, 501);

@@ -6,6 +6,7 @@ import {
 } from "../database/functions.js";
 import responseError from "../utils/errors.js";
 import { generatePaymentId } from "../utils/token.js";
+import Response from "../utils/response.js";
 
 const router = express();
 
@@ -14,7 +15,7 @@ router.get("/", async (req, res) => {
 
   await getAllPaymentWithId({ id }).then((payments) => {
     if (!Array.isArray(payments)) return responseError(res, 510);
-    res.json(payments);
+    Response(req, res, payments);
   });
 });
 
@@ -36,7 +37,7 @@ router.post("/", async (req, res) => {
       await insertNewPayment({ value, paymentId, id }).then(
         ({ acknowledged }) => {
           if (!acknowledged) return responseError(res, 501);
-          res.json({
+          Response(req, res, {
             success: acknowledged,
             payment: {
               value,

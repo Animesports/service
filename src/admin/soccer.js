@@ -11,6 +11,7 @@ import schemas from "../../schemas.json" assert { type: "json" };
 import { ArrToObj, DotObj, ObjToArr } from "../../utils/converter.js";
 import { getGameStatus } from "../../utils/soccer.js";
 import { Connection } from "../../database/connection.js";
+import Response from "../../utils/response.js";
 
 const router = express();
 
@@ -31,7 +32,7 @@ router.patch("/close/:id", async (req, res) => {
         console.info("a1");
         Connection.emit("update-game", { ...game, score, status: "closed" });
 
-        return res.json({ acknowledged });
+        return Response(req, res, { acknowledged });
       },
       () => {
         responseError(res, 501);
@@ -53,7 +54,7 @@ router.delete("/:id", async (req, res) => {
             if (!!deletedCount) {
               Connection.emit("delete-game", game);
             }
-            return res.json({ deleted: !!deletedCount, id });
+            return Response(req, res, { deleted: !!deletedCount, id });
           },
           () => {
             responseError(res, 501);
@@ -67,7 +68,7 @@ router.delete("/:id", async (req, res) => {
             console.info("a2");
             Connection.emit("update-game", { ...game, status: "canceled" });
 
-            return res.json({ acknowledged });
+            return Response(req, res, { acknowledged });
           },
           () => {
             responseError(res, 501);
@@ -106,7 +107,7 @@ router.patch("/score/:id", async (req, res) => {
           score: { visited, visitor },
         });
 
-        res.json({
+        Response(req, res, {
           acknowledged,
         });
       },
@@ -138,7 +139,10 @@ router.patch("/:id", async (req, res) => {
           ...DotObj(ArrToObj(acceptProps)),
         });
 
-        res.json({ acknowledged, modified: DotObj(ArrToObj(acceptProps)) });
+        Response(req, res, {
+          acknowledged,
+          modified: DotObj(ArrToObj(acceptProps)),
+        });
       },
       () => {
         responseError(res, 501);
@@ -167,7 +171,7 @@ router.post("/", async (req, res) => {
 
           Connection.emit("insert-game", game);
 
-          res.json({
+          Response(req, res, {
             success: acknowledged,
             game,
           });

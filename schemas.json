@@ -6,7 +6,6 @@
     "data.pix": "string",
     "data.password": "string",
     "data.admin": "boolean",
-    "data.picture": "string",
     "config.twosteps": "boolean",
     "config.video": "boolean",
     "config.darkmode": "boolean"

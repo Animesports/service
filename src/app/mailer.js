@@ -9,6 +9,7 @@ import responseError from "../../utils/errors.js";
 import { sendEmail } from "../../utils/mailer.js";
 import { CodeValidation, TokenValidation } from "../../utils/mailShape.js";
 import { generateCode, generateToken } from "../../utils/token.js";
+import Response from "../../utils/response.js";
 
 const router = express();
 
@@ -35,8 +36,8 @@ router.post("/code", async (req, res) => {
             },
             (err, info) => {
               if (err) return responseError(res, 500);
-              if (info?.accepted) return res.json({ success: true });
-              res.json({ success: false });
+              if (info?.accepted) return Response(req, res, { success: true });
+              Response(req, res, { success: false });
             }
           );
         },
@@ -65,7 +66,7 @@ router.get("/code/:code", async (req, res) => {
         },
       }).then(async ({ acknowledged }) => {
         await validationRemove({ code });
-        res.json({ success: acknowledged });
+        Response(req, res, { success: acknowledged });
       });
     },
     () => {
@@ -96,8 +97,8 @@ router.post("/token", async (req, res) => {
             },
             (err, info) => {
               if (err) return responseError(res, 500);
-              if (info?.accepted) return res.json({ success: true });
-              res.json({ success: false });
+              if (info?.accepted) return Response(req, res, { success: true });
+              Response(req, res, { success: false });
             }
           );
         },
@@ -126,7 +127,7 @@ router.get("/token/:token", async (req, res) => {
         },
       }).then(async ({ acknowledged }) => {
         await validationRemove({ token });
-        res.json({ success: acknowledged });
+        Response(req, res, { success: acknowledged });
       });
     },
     () => {

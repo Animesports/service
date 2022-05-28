@@ -3,13 +3,36 @@ Connection.check();
 
 export function getAllNotifications() {
   return new Promise(async (resolve, reject) => {
-    Connection.notifications.find({}).toArray().then(resolve, reject);
+    Connection.notifications
+      .find(
+        {},
+        {
+          projection: {
+            _id: 0,
+            expireAt: 0,
+          },
+        }
+      )
+      .toArray()
+      .then(resolve, reject);
   });
 }
 
 export function getNotification({ id }) {
   return new Promise(async (resolve, reject) => {
-    Connection.notifications.findOne({ id }).then(resolve, reject);
+    Connection.notifications
+      .findOne(
+        { id },
+        {
+          projection: {
+            _id: 0,
+            logEvent: 0,
+            logMessage: 0,
+            expireAt: 0,
+          },
+        }
+      )
+      .then(resolve, reject);
   });
 }
 
@@ -124,9 +147,19 @@ export function updateSoccerGame({ id, props }) {
 export function searchSoccerGame({ id }) {
   return new Promise((resolve, reject) => {
     Connection.games
-      .findOne({
-        id,
-      })
+      .findOne(
+        {
+          id,
+        },
+        {
+          projection: {
+            _id: 0,
+            logEvent: 0,
+            logMessage: 0,
+            expireAt: 0,
+          },
+        }
+      )
       .then(resolve, reject);
   });
 }
@@ -134,7 +167,14 @@ export function searchSoccerGame({ id }) {
 export function getAllSoccerGames(filter) {
   return new Promise((resolve, reject) => {
     Connection.games
-      .find(filter ?? {})
+      .find(filter ?? {}, {
+        projection: {
+          _id: 0,
+          logEvent: 0,
+          logMessage: 0,
+          expireAt: 0,
+        },
+      })
       .toArray()
       .then(resolve, reject);
   });
@@ -175,7 +215,19 @@ export async function insertNewSoccerGame({ id, teams, date, reference }) {
 
 export function getSeasonById({ id }) {
   return new Promise((resolve, reject) => {
-    Connection.seasons.findOne({ id }).then(resolve, reject);
+    Connection.seasons
+      .findOne(
+        { id },
+        {
+          projection: {
+            _id: 0,
+            logEvent: 0,
+            logMessage: 0,
+            expireAt: 0,
+          },
+        }
+      )
+      .then(resolve, reject);
   });
 }
 
@@ -217,29 +269,65 @@ export function updateSeason({ id, func, props }) {
 export function getClientSeasonPayment({ season, id }) {
   return new Promise(async (resolve, reject) => {
     Connection.payments
-      .findOne({ season, reference: id })
+      .findOne(
+        { season, reference: id },
+        {
+          projection: {
+            _id: 0,
+            value: 0,
+            logEvent: 0,
+            expireAt: 0,
+            logMessage: 0,
+          },
+        }
+      )
       .then(resolve, reject);
   });
 }
 
 export function getAllPaymentBySeason({ season }) {
   return new Promise(async (resolve, reject) => {
-    Connection.payments.find({ season }).toArray().then(resolve, reject);
+    Connection.payments
+      .find(
+        { season },
+        {
+          projection: {
+            _id: 0,
+            value: 0,
+            logEvent: 0,
+            expireAt: 0,
+            logMessage: 0,
+          },
+        }
+      )
+      .toArray()
+      .then(resolve, reject);
   });
 }
 
-export function getAllPayments() {
+export function getAllPayments(options) {
   return new Promise(async (resolve, reject) => {
-    Connection.payments.find().toArray().then(resolve, reject);
+    Connection.payments.find({}, options).toArray().then(resolve, reject);
   });
 }
 
 export function searchPayment({ paymentId }) {
   return new Promise(async (resolve, reject) => {
     Connection.payments
-      .findOne({
-        id: paymentId,
-      })
+      .findOne(
+        {
+          id: paymentId,
+        },
+        {
+          projection: {
+            _id: 0,
+            value: 0,
+            logEvent: 0,
+            expireAt: 0,
+            logMessage: 0,
+          },
+        }
+      )
       .then(resolve, reject);
   });
 }
@@ -361,13 +449,34 @@ export function insertNewSession({ sessionId, id, password, email }) {
 
 export function searchSessionById({ sessionId }) {
   return new Promise((accept, reject) => {
-    Connection.session.findOne({ sessionId }).then(accept, reject);
+    Connection.session
+      .findOne(
+        { sessionId },
+        {
+          projection: {
+            _id: 0,
+            logEvent: 0,
+            logMessage: 0,
+            expireAt: 0,
+          },
+        }
+      )
+      .then(accept, reject);
   });
 }
 
 export function validationSearcher(parameter) {
   return new Promise((accept, reject) => {
-    Connection.validation.findOne(parameter).then(accept, reject);
+    Connection.validation
+      .findOne(parameter, {
+        projection: {
+          _id: 0,
+          logEvent: 0,
+          logMessage: 0,
+          expireAt: 0,
+        },
+      })
+      .then(accept, reject);
   });
 }
 
@@ -399,9 +508,9 @@ export function validationCreate({ type, value, reference }) {
   });
 }
 
-export function getAllClients() {
+export function getAllClients(options) {
   return new Promise((accept, reject) => {
-    Connection.clients.find().toArray().then(accept, reject);
+    Connection.clients.find({}, options).toArray().then(accept, reject);
   });
 }
 
@@ -458,7 +567,14 @@ export function validateClient({ id, email, password }) {
   // Validar um id ou verificar sua existência no Banco
   return new Promise((resolve, reject) => {
     Connection.clients
-      .findOne({ id, "data.email.address": email, "data.password": password })
+      .findOne(
+        { id, "data.email.address": email, "data.password": password },
+        {
+          projection: {
+            _id: 0,
+          },
+        }
+      )
       .then((client) => {
         resolve({
           id: client?.id,
@@ -473,7 +589,14 @@ export function validateClientCredentials({ email, password }) {
   // Validar as credenciais ou verificar sua existência no Banco
   return new Promise((resolve, reject) => {
     Connection.clients
-      .findOne({ "data.email.address": email, "data.password": password })
+      .findOne(
+        { "data.email.address": email, "data.password": password },
+        {
+          projection: {
+            _id: 0,
+          },
+        }
+      )
       .then((client) => {
         if (!client?.id) return reject("not-found");
         resolve(client);
@@ -484,7 +607,16 @@ export function validateClientCredentials({ email, password }) {
 export function getAllClientDataWithId({ id }) {
   // Encontrar um usuário com o ID e retornar os dados
   return new Promise((accept, reject) => {
-    Connection.clients.findOne({ id }).then(accept, reject);
+    Connection.clients
+      .findOne(
+        { id },
+        {
+          projection: {
+            _id: 0,
+          },
+        }
+      )
+      .then(accept, reject);
   });
 }
 
@@ -492,7 +624,19 @@ export function findClientEmail({ email }) {
   // Encontrar um email na lista de clientes
   return new Promise((accept, reject) => {
     Connection.clients
-      .findOne({ "data.email.address": email })
+      .findOne(
+        { "data.email.address": email },
+        {
+          projection: {
+            _id: 0,
+            config: 0,
+            "data.name": 0,
+            "data.pix": 0,
+            "data.password": 0,
+            "data.admin": 0,
+          },
+        }
+      )
       .then((client) => {
         accept(client?.data.email ?? {});
       }, reject);
@@ -502,8 +646,19 @@ export function findClientEmail({ email }) {
 export function findClientId({ id }) {
   // Encontrar um Id na lista de clientes
   return new Promise((accept, reject) => {
-    Connection.clients.findOne({ id }).then((client) => {
-      accept({ id: client?.id });
-    }, reject);
+    Connection.clients
+      .findOne(
+        { id },
+        {
+          projection: {
+            _id: 0,
+            data: 0,
+            config: 0,
+          },
+        }
+      )
+      .then((client) => {
+        accept({ id: client?.id });
+      }, reject);
   });
 }

@@ -18,6 +18,7 @@ import { sendEmail } from "../../utils/mailer.js";
 import { WinnerNotification } from "../../utils/mailShape.js";
 import { getSeasonWinners } from "../../utils/soccer.js";
 import { generateNotifyId } from "../../utils/token.js";
+import Response from "../../utils/response.js";
 
 const router = express();
 
@@ -34,7 +35,7 @@ router.get("/", (req, res) => {
         }
       );
 
-      res.json(season);
+      Response(req, res, season);
     },
     () => {
       responseError(res, 501);

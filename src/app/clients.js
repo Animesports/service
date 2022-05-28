@@ -10,25 +10,43 @@ import {
 } from "../../database/functions.js";
 import responseError from "../../utils/errors.js";
 import { generateId, generateSessionId } from "../../utils/token.js";
+import Response from "../../utils/response.js";
 
 const router = express();
 
 router.get("/", async (req, res) => {
   const { month, year } = res.locals.season;
 
-  await getAllPayments().then(async (payments) => {
+  await getAllPayments({
+    projection: {
+      _id: 0,
+      expireAt: 0,
+      logEvent: 0,
+      logMessage: 0,
+    },
+  }).then(async (payments) => {
     if (!Array.isArray(payments)) return responseError(res, 501);
 
     payments = payments
       .filter((pay) => pay.season === `${month}/${year}`)
       .map((pay) => pay.reference);
 
-    await getAllClients().then((clients) => {
+    await getAllClients({
+      projection: {
+        _id: 0,
+        config: 0,
+        "data.pix": 0,
+        "data.email": 0,
+        "data.password": 0,
+      },
+    }).then((clients) => {
       if (!Array.isArray(clients)) return responseError(res, 501);
 
       clients = clients.filter((client) => payments.includes(client.id));
 
-      res.json(
+      Response(
+        req,
+        res,
         clients.map(({ id, ["data"]: { name, picture } }) => {
           return {
             id,
@@ -72,7 +90,7 @@ router.post("/", async (req, res) => {
                     }).then(
                       ({ acknowledged }) => {
                         if (!acknowledged) return error(clientInserted);
-                        res.json({
+                        Response(req, res, {
                           success: true,
                           sessionId,
                           client: client,
@@ -104,7 +122,7 @@ router.post("/", async (req, res) => {
 
   function error(inserted) {
     if (inserted)
-      return res.json({
+      return Response(req, res, {
         success: true,
         client: responseError(null, 510),
       });
@@ -127,7 +145,7 @@ router.post("/validate", async (req, res) => {
         }).then(
           ({ acknowledged }) => {
             if (!acknowledged) return responseError(res, 501);
-            res.json({ valid: true, sessionId, client });
+            Response(req, res, { valid: true, sessionId, client });
           },
           () => {
             responseError(res, 501);
@@ -137,7 +155,7 @@ router.post("/validate", async (req, res) => {
     },
     (error) => {
       if (error !== "not-found") return responseError(res, 501);
-      res.json({ valid: false });
+      Response(req, res, { valid: false });
     }
   );
 });
