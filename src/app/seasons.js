@@ -140,11 +140,9 @@ router.post("/close", async (req, res) => {
                         ).convert("vencedor", "es")} da temporada de ${month(
                           m
                         )}.`,
-                        winners: winners.map(
-                          ({ ["data"]: { name, picture } }) => {
-                            return { name, picture };
-                          }
-                        ),
+                        winners: winners.map(({ ["data"]: { name, id } }) => {
+                          return { name, id };
+                        }),
                       };
 
                       newNotification(notification).then(({ acknowledged }) => {

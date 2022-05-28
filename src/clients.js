@@ -7,6 +7,7 @@ import {
 import responseError from "../utils/errors.js";
 import schemas from "../schemas.json" assert { type: "json" };
 import { ArrToObj, ObjToArr } from "../utils/converter.js";
+import { v2 as cloudinary } from "cloudinary";
 
 const router = express();
 
@@ -17,6 +18,40 @@ router.get("/", async (req, res) => {
     if (!user?.id) return responseError(res, 400);
     res.json(user);
   });
+});
+
+router.post("/profile", (req, res) => {
+  const image64 = req.body.image64;
+  const id = res.locals.id;
+
+  if (typeof image64 !== "string") return responseError(res, 400);
+
+  cloudinary.config({
+    cloud_name: "hugorodriguesqw",
+    api_key: String(process.env.CLOUDINARY_KEY),
+    api_secret: String(process.env.CLOUDINARY_SECRET),
+  });
+
+  cloudinary.uploader
+    .upload(image64, {
+      overwrite: true,
+      invalidate: true,
+      public_id: "animesports/" + id,
+      transformation: [
+        { height: 120, width: 120, crop: "limit" },
+        { gravity: "center", height: 120, width: 120, crop: "crop" },
+        { fetch_format: "webp" },
+      ],
+    })
+    .then(
+      (response) => {
+        if (response?.public_id) return res.json(response);
+        responseError(res, 501);
+      },
+      () => {
+        responseError(res, 501);
+      }
+    );
 });
 
 router.patch("/", async (req, res) => {

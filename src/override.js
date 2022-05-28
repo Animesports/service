@@ -29,8 +29,8 @@ router.use(
   "*",
   expressContentTypeOverride({ contentType: "application/json" })
 );
-router.use(express.json({ type: "application/json" }));
-router.use(express.urlencoded({ extended: true }));
+router.use(express.json({ limit: "5mb", type: "application/json" }));
+router.use(express.urlencoded({ limit: "5mb", extended: true }));
 
 const override = { router, methods: "" };
 export default override;
