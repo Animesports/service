@@ -188,7 +188,7 @@ router.post("/open", (req, res) => {
         const notification = {
           id: notificationId,
           title: "Vamos nessa!",
-          message: `A temporada de ${m} começou. Faça seus palpites!`,
+          message: `A temporada de ${month(m)} começou. Faça seus palpites!`,
           onlyLogged: true,
           action: "redirect-soccer",
         };
