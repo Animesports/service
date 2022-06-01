@@ -83,7 +83,7 @@ router.post("/", async (req, res) => {
                         Response(req, res, {
                           success: true,
                           sessionId,
-                          client: client,
+                          user: client,
                         });
                       },
                       () => {
