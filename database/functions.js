@@ -219,6 +219,7 @@ export function insertNewSeason({ id }) {
     const expire = new Date();
 
     expire.setMonth(expire.getMonth() + 1);
+    expire.setDate(expire.getDate() + 2);
 
     await Connection.seasons.createIndex(
       { expireAt: 1 },
@@ -231,7 +232,6 @@ export function insertNewSeason({ id }) {
       logEvent: 1,
       logMessage: "Season Removed!",
       id,
-      references: [],
       ticket: Number(process.env.APP_TICKET) ?? 3.5,
     };
 
