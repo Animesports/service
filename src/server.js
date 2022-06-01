@@ -46,6 +46,10 @@ router.use(session.router);
 // Season Control
 router.use((req, res, next) => {
   const date = new Date();
+
+  date.setHours(date.getHours() - 3);
+  date.setMinutes(0);
+
   res.locals.season = {
     day: date.getUTCDate(),
     month: date.getUTCMonth() + 1,

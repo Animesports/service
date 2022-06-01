@@ -27,6 +27,8 @@ router.get("/", (req, res) => {
 
   getSeasonById({ id: `${m}/${year}` }).then(
     async (season) => {
+      if (!season) return responseError(res, 510);
+
       await getAllPaymentBySeason({ season: `${m}/${year}` }).then(
         (payments) => {
           season.amount = payments
@@ -176,7 +178,7 @@ router.post("/close", async (req, res) => {
 });
 
 router.post("/open", (req, res) => {
-  const { m, year } = req.body.utc_date ?? res.locals.season;
+  const { ["month"]: m, year } = req.body.utc_date ?? res.locals.season;
 
   insertNewSeason({ id: `${m}/${year}` }).then(
     ({ acknowledged, season }) => {
