@@ -184,6 +184,21 @@ router.post("/open", (req, res) => {
     ({ acknowledged, season }) => {
       if (!acknowledged) return responseError(res, 501);
 
+      generateNotifyId().then((notificationId) => {
+        const notification = {
+          id: notificationId,
+          title: "Vamos nessa!",
+          message: `A temporada de ${m} começou. Faça seus palpites!`,
+          onlyLogged: true,
+          action: "redirect-soccer",
+        };
+
+        newNotification(notification).then(({ acknowledged }) => {
+          if (!acknowledged) return;
+          Connection.emit("insert-notification", notification);
+        });
+      });
+
       Connection.emit("update-season", season);
       res.end();
     },
